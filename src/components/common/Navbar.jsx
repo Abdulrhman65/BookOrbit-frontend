@@ -17,6 +17,8 @@ import {
   Inbox,
   Send,
   RefreshCcw,
+  Repeat,
+  Coins
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -26,6 +28,7 @@ import { OrbitIcon } from "./OrbitIcon";
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const location = useLocation();
   const { isLoggedIn, user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
@@ -154,14 +157,65 @@ const Navbar = () => {
                   </motion.button>
 
                   {user?.role?.toLowerCase() !== "admin" && (
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      className="hidden lg:flex relative w-9 h-9 rounded-lg items-center justify-center bg-white/60 dark:bg-white/5 text-library-primary/70 dark:text-gray-400 hover:text-library-accent transition-all border border-library-primary/10 dark:border-white/10"
-                      title="الإشعارات"
+                    <div 
+                      className="relative hidden lg:block"
+                      onMouseEnter={() => setNotificationsOpen(true)}
+                      onMouseLeave={() => setNotificationsOpen(false)}
                     >
-                      <Bell size={17} />
-                      <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-dark-bg animate-pulse"></span>
-                    </motion.button>
+                      <Link
+                        to="/notifications"
+                        className="relative w-9 h-9 rounded-lg items-center justify-center bg-white/60 dark:bg-white/5 text-library-primary/70 dark:text-gray-400 hover:text-library-accent transition-all border border-library-primary/10 dark:border-white/10 flex"
+                        title="الإشعارات"
+                      >
+                        <Bell size={17} />
+                        <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-dark-bg animate-pulse"></span>
+                      </Link>
+
+                      <AnimatePresence>
+                        {notificationsOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute left-0 mt-2 w-80 bg-white dark:bg-[#121214] rounded-2xl shadow-2xl border border-library-primary/10 dark:border-white/10 z-[100] overflow-hidden backdrop-blur-xl"
+                          >
+                            <div className="p-4 border-b border-library-primary/5 dark:border-white/5 flex items-center justify-between">
+                              <h3 className="text-xs font-black text-library-primary dark:text-white">إشعارات حديثة</h3>
+                              <Link to="/notifications" className="text-[10px] font-black text-library-accent hover:underline">عرض الكل</Link>
+                            </div>
+                            <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
+                              {[
+                                { id: 1, title: "طلب استعارة جديد", time: "5د", icon: <Repeat size={14} className="text-emerald-500" />, isRead: false },
+                                { id: 2, title: "تم توثيق حسابك بنجاح", time: "2س", icon: <Shield size={14} className="text-blue-500" />, isRead: true },
+                                { id: 3, title: "حصلت على نقاط مكافأة", time: "5س", icon: <Coins size={14} className="text-amber-500" />, isRead: false },
+                              ].map((n) => (
+                                <Link 
+                                  key={n.id} 
+                                  to="/notifications" 
+                                  className={`flex items-center gap-3 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-library-primary/[0.02] dark:border-white/[0.02] last:border-0 ${!n.isRead ? "bg-library-accent/[0.02] dark:bg-library-accent/[0.05]" : ""}`}
+                                >
+                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${!n.isRead ? "bg-library-accent/10" : "bg-gray-100 dark:bg-white/5"}`}>
+                                    {n.icon}
+                                  </div>
+                                  <div className="min-w-0 flex-grow">
+                                    <p className={`text-[11px] truncate ${!n.isRead ? "font-black text-library-primary dark:text-white" : "font-bold text-gray-500"}`}>{n.title}</p>
+                                    <p className="text-[9px] text-gray-400 font-bold">{n.time}</p>
+                                  </div>
+                                  {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-library-accent"></div>}
+                                </Link>
+                              ))}
+                            </div>
+                            <Link 
+                              to="/notifications" 
+                              className="block p-3 text-center text-[10px] font-black text-gray-400 hover:text-library-accent hover:bg-gray-50 dark:hover:bg-white/5 transition-all bg-gray-50/50 dark:bg-white/[0.02]"
+                            >
+                              مشاهدة كافة الإشعارات
+                            </Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   )}
 
                   <Link
