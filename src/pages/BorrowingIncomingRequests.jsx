@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import {
@@ -16,7 +16,8 @@ import {
   User,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  MessageSquare
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
@@ -90,6 +91,7 @@ const PaginationBar = ({ page, totalPages, onChange, disabled }) => {
 
 const BorrowingIncomingRequests = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const [page, setPage] = useState(1);
@@ -440,12 +442,16 @@ const BorrowingIncomingRequests = () => {
                           )}
                           <button
                             type="button"
-                            disabled={loadingContactRecordId === rid || !rid}
-                            onClick={() => handleLoadContactInfo(rid)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-black text-indigo-700 transition-all hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-300"
+                            onClick={() => navigate(`/chat/${req.studentId}`, { 
+                              state: { 
+                                studentName: studentName,
+                                studentImage: req.studentPersonalPhotoUrl || req.PersonalPhotoUrl || null
+                              } 
+                            })}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-black text-indigo-700 transition-all hover:bg-indigo-100 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-300"
                           >
-                            {loadingContactRecordId === rid ? <Loader2 size={14} className="animate-spin" /> : <User size={14} />}
-                            بيانات التواصل
+                            <MessageSquare size={14} />
+                            تواصل
                           </button>
                         </>
                       )}

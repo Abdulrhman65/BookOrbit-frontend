@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import {
@@ -14,7 +14,8 @@ import {
   X,
   User,
   CheckCircle,
-  XCircle
+  XCircle,
+  MessageSquare
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
@@ -86,6 +87,7 @@ const PaginationBar = ({ page, totalPages, onChange, disabled }) => {
 
 const BorrowingOutgoingRequests = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const [page, setPage] = useState(1);
@@ -325,7 +327,7 @@ const BorrowingOutgoingRequests = () => {
                   // This means `normalizeBorrowingRequest` currently maps the related name into `studentName`.
                   // For me/out, the name in `studentName` might still be the borrower, or it might not be populated with lender.
                   // Let's assume `req.studentName` or `req.lendingStudentName` or "زميلك"
-                  const ownerName = req.lendingStudentName || req.ownerName || req.studentName || "زميلك";
+                  const ownerName = req.lenderName || req.ownerFullName || req.lenderFullName || "صاحب النسخة";
                   
                   const reqDate = req.requestDate || req.createdAt || req.createdAtUtc;
                   const expDate = req.expectedReturnDate || req.returnDate || req.expirationDate;
@@ -381,6 +383,20 @@ const BorrowingOutgoingRequests = () => {
                         >
                           {loadingDetailId === id ? <Loader2 size={14} className="animate-spin" /> : null}
                           تفاصيل
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/chat/${req.lenderId}`, { 
+                            state: { 
+                              studentName: ownerName,
+                              studentImage: null 
+                            } 
+                          })}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-black text-indigo-700 transition-all hover:bg-indigo-100 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-300"
+                        >
+                          <MessageSquare size={14} />
+                          تواصل
                         </button>
 
                         {statusKey !== "Pending" && statusKey !== "Accepted" && (

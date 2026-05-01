@@ -14,11 +14,12 @@ import {
   PencilLine,
   X,
   Loader2,
-  Coins
+  Coins,
+  Star,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/common/Navbar";
-import { studentsApi } from "../services/api";
+import { studentsApi, reviewsApi } from "../services/api";
 
 const ProfileField = ({ icon: Icon, label, value, color = "indigo" }) => (
   <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50/80 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 group hover:border-indigo-500/30 transition-all">
@@ -44,11 +45,28 @@ const StudentProfile = () => {
   const [form, setForm] = useState({
     fullName: "",
   });
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     setForm({
       fullName: user?.fullName || user?.Name || "",
     });
+    if (user?.studentId) {
+      reviewsApi.getByStudentId(user.studentId)
+        .then(async (res) => {
+          const rawReviews = Array.isArray(res) ? res : (res?.items || []);
+          const uniqueIds = [...new Set(rawReviews.map(r => r.reviewerStudentId || r.ReviewerStudentId).filter(Boolean))];
+          const profiles = await Promise.all(uniqueIds.map(id => studentsApi.getById(id).catch(() => null)));
+          const profileMap = Object.fromEntries(profiles.filter(Boolean).map(p => [p.id || p.Id, p.fullName || p.name || p.Name]));
+          
+          const enriched = rawReviews.map(rev => ({
+            ...rev,
+            reviewerName: profileMap[rev.reviewerStudentId || rev.ReviewerStudentId] || "طالب مجهول"
+          }));
+          setReviews(enriched);
+        })
+        .catch(() => {});
+    }
   }, [user]);
 
   const handleEditChange = (e) => {
@@ -207,8 +225,11 @@ const StudentProfile = () => {
                   </div>
                   <div className="w-px h-6 bg-gray-100 dark:bg-white/5" />
                   <div className="text-center">
-                    <p className="text-[14px] font-black text-library-accent">{user?.points || 0}</p>
-                    <p className="text-[8px] text-gray-400 font-bold uppercase">نقاطي</p>
+                    <p className="text-[14px] font-black text-amber-500 flex items-center justify-center gap-1">
+                      <Star size={12} fill="currentColor" />
+                      {reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : "0.0"}
+                    </p>
+                    <p className="text-[8px] text-gray-400 font-bold uppercase">تقييمي</p>
                   </div>
                 </div>
               )}
@@ -342,6 +363,37 @@ const StudentProfile = () => {
                           </p>
                         </div>
                       </motion.div>
+                    )}
+                  </div>
+
+                  {/* Personal Reviews Section */}
+                  <div className="bg-white/60 dark:bg-dark-surface/60 backdrop-blur-xl rounded-2xl p-6 border border-white dark:border-white/5 shadow-sm">
+                    <h3 className="text-base font-black text-library-primary dark:text-white mb-5 flex items-center gap-2">
+                      <Star className="text-amber-500" size={16} fill="currentColor" />
+                      تقييمات الزملاء لي
+                    </h3>
+                    
+                    {reviews.length > 0 ? (
+                      <div className="space-y-4">
+                        {reviews.map((review, idx) => (
+                          <div key={review.id || idx} className="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-1">
+                                {[1, 2, 3, 4, 5].map(s => (
+                                  <Star key={s} size={10} className={s <= Number(review.rating || 0) ? "text-amber-500" : "text-gray-200"} fill={s <= Number(review.rating || 0) ? "currentColor" : "none"} />
+                                ))}
+                              </div>
+                              <span className="text-[9px] text-gray-400 font-bold">{review.createdAt ? new Date(review.createdAt).toLocaleDateString('ar-EG') : ""}</span>
+                            </div>
+                            <p className="text-xs font-medium text-library-primary/70 dark:text-gray-400 italic">"{review.description || review.comment || review.content || "بدون تعليق"}"</p>
+                            <p className="text-[10px] font-black text-library-primary dark:text-white mt-2">— {review.reviewerName || review.ReviewerName || review.reviewerStudentName || review.ReviewerStudentName || review.reviewer?.fullName || review.reviewer?.name || review.Reviewer?.FullName || review.Reviewer?.Name || "طالب مجهول"}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-8 text-center bg-gray-50/50 dark:bg-white/[0.02] rounded-xl border border-dashed border-gray-200 dark:border-white/5">
+                        <p className="text-xs font-bold text-gray-400">لم تصلك أي تقييمات بعد.</p>
+                      </div>
                     )}
                   </div>
 

@@ -193,10 +193,10 @@ const normalizeBorrowingRequest = (request = {}) => {
     ...request,
     id: request.Id || request.id,
     lendingRecordId: request.LendingRecordId || request.lendingRecordId || request.lendingListRecordId,
-    studentName: request.studentName || request.borrowingStudentName || request.BorrowingStudentName || "",
-    studentId: request.studentId || request.borrowingStudentId || request.BorrowingStudentId || request.StudentId || "",
-    lenderName: request.lenderName || request.LenderName || "",
-    lenderId: request.lenderId || request.LenderId || request.ownerId || request.OwnerId || "",
+    studentName: request.studentName || request.borrowingStudentName || request.BorrowingStudentName || request.borrowerName || request.BorrowerName || request.student?.fullName || request.borrower?.fullName || "",
+    studentId: request.studentId || request.borrowingStudentId || request.BorrowingStudentId || request.StudentId || request.borrowerId || request.BorrowerId || request.student?.id || "",
+    lenderName: request.lenderName || request.LenderName || request.lenderStudentName || request.lenderStudentFullName || request.ownerFullName || request.ownerName || request.OwnerName || request.LendingStudentName || request.LenderStudentName || request.lendingStudentName || request.lenderFullName || request.owner?.fullName || request.lender?.fullName || "",
+    lenderId: request.lenderId || request.LenderId || request.ownerId || request.OwnerId || request.lenderStudentId || request.LenderStudentId || request.owner?.id || "",
     bookTitle: request.bookTitle || request.BookTitle || "",
     bookId: request.bookId || request.BookId || "",
     requestDate: request.requestDate || request.createdAtUtc || request.createdAt || request.createdAtUTC,
@@ -326,20 +326,24 @@ async function apiRequest(path, options = {}) {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
-  if (options.body) {
-    if (!(options.body instanceof FormData)) {
-      headers["Content-Type"] = "application/json";
-    }
-  } else {
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  } else if (!options.body) {
     delete headers["Content-Type"];
   }
 
-  const finalUrl = path.startsWith("http") 
+  let finalUrl = path.startsWith("http") 
     ? path 
-    : (path.startsWith("/api/") ? `${API_BASE_URL}${path}` : `${API_V1}${path}`);
+    : `${API_V1}${path.startsWith("/") ? "" : "/"}${path}`;
+
+  if (options.params) {
+    const qs = buildQuery(options.params);
+    if (qs) finalUrl += (finalUrl.includes("?") ? "&" : "?") + qs;
+  }
 
   const response = await fetch(finalUrl, {
     ...options,
+    method: (options.method || "GET").toUpperCase(),
     headers,
   });
 
@@ -837,4 +841,22 @@ export const imagesApi = {
 
   /** GET /images/books/{bookId} — Book cover image */
   getBookImage: (bookId) => getBookImageUrl(bookId),
+};
+
+// ─── 9. REVIEWS ─────────────────────────────────────────────────────────────
+export const reviewsApi = {
+  /** POST /api/v1/borrowingtransactions/{id}/review */
+  create: (borrowingTransactionId, reviewData) =>
+    apiRequest(`/borrowingtransactions/${encodeURIComponent(borrowingTransactionId)}/review`, {
+      method: "POST",
+      body: JSON.stringify(reviewData),
+    }),
+
+  /** GET /api/v1/borrowingreviews/{borrowingReviewId} */
+  getById: (borrowingReviewId) =>
+    apiRequest(`/borrowingreviews/${borrowingReviewId}`),
+
+  /** GET /api/v1/borrowingreviews?ReviewedStudentId={studentId} */
+  getByStudentId: (studentId) =>
+    apiRequest(`/borrowingreviews`, { params: { ReviewedStudentId: studentId } }),
 };

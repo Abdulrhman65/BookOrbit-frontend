@@ -26,6 +26,8 @@ import {
   MessageSquare
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { studentsApi, imagesApi } from "../services/api";
+import { API_V1, tokenStore } from "../utils/constants";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
 import toast from "react-hot-toast";
@@ -44,6 +46,7 @@ const Chat = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showHeaderMenu, setShowHeaderMenu] = useState(false);
   
   // Real Recording States
   const [isRecording, setIsRecording] = useState(false);
@@ -97,9 +100,73 @@ const Chat = () => {
   useEffect(() => {
     if (studentId) {
       const found = conversations.find(c => c.id === studentId);
-      if (found) setActiveChat(found);
+      if (found) {
+        setActiveChat(found);
+        
+        // If data is missing (e.g. name is placeholder or image is null), fetch it
+        if (found.name === "طالب جديد" || !found.image) {
+          fetchStudentData(studentId);
+        }
+      }
     }
   }, [studentId, conversations]);
+
+  const fetchStudentData = async (id) => {
+    try {
+      const data = await studentsApi.getById(id);
+      if (data) {
+        const name = data.fullName || data.name || data.Name || "طالب";
+        setConversations(prev => prev.map(c => 
+          c.id === id ? { ...c, name } : c
+        ));
+        
+        // Now fetch image
+        fetchStudentImage(id);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch student data in chat:", err);
+    }
+  };
+
+  const fetchStudentImage = async (id) => {
+    try {
+      const { accessToken } = tokenStore.get();
+      const imageUrl = `${API_V1}/images/students/${id}`;
+      
+      const res = await fetch(imageUrl, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "ngrok-skip-browser-warning": "69420"
+        }
+      });
+      
+      if (res.ok) {
+        const contentType = res.headers.get("content-type") || "";
+        let finalImage = null;
+
+        if (contentType.startsWith("image/") || contentType.includes("octet-stream")) {
+          const blob = await res.blob();
+          finalImage = URL.createObjectURL(blob);
+        } else {
+          const text = await res.text();
+          const cleaned = text.replace(/^"|"$/g, "").trim();
+          if (cleaned.startsWith("data:image/")) {
+            finalImage = cleaned;
+          } else if (cleaned.length > 100) {
+            finalImage = `data:image/jpeg;base64,${cleaned}`;
+          }
+        }
+
+        if (finalImage) {
+          setConversations(prev => prev.map(c => 
+            c.id === id ? { ...c, image: finalImage } : c
+          ));
+        }
+      }
+    } catch (err) {
+      console.warn("Could not fetch student image in chat:", err);
+    }
+  };
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -290,7 +357,53 @@ const Chat = () => {
                     </div>
                   </div>
                 </div>
-                <button className="w-9 h-9 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-500 hover:bg-library-primary hover:text-white transition-all"><MoreVertical size={18} /></button>
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowHeaderMenu(!showHeaderMenu)}
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${showHeaderMenu ? 'bg-library-primary text-white shadow-lg' : 'bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-library-primary/10'}`}
+                  >
+                    <MoreVertical size={18} />
+                  </button>
+                  
+                  <AnimatePresence>
+                    {showHeaderMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        className="absolute left-0 top-full mt-2 w-48 bg-white dark:bg-[#121214] rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-[200]"
+                      >
+                        <div className="p-1.5 flex flex-col">
+                          <button
+                            onClick={() => {
+                              setShowHeaderMenu(false);
+                              navigate(`/student/${activeChat.id}`);
+                            }}
+                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-right transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                              <User size={14} />
+                            </div>
+                            <span className="text-[12px] font-black">عرض الملف الشخصي</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => {
+                              setShowHeaderMenu(false);
+                              toast.success("سيتم إضافة خاصية مسح المحادثة قريباً");
+                            }}
+                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-right transition-all group"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-all">
+                              <Trash2 size={14} />
+                            </div>
+                            <span className="text-[12px] font-black">مسح المحادثة</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               {/* Messages Area */}

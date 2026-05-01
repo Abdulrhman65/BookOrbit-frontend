@@ -24,11 +24,13 @@ import {
   Repeat,
   BookOpen,
   X,
+  Star,
+  MessageSquare,
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
 import { useAuth } from "../context/AuthContext";
-import { borrowingTransactionsApi, booksApi, bookCopiesApi } from "../services/api";
+import { borrowingTransactionsApi, booksApi, bookCopiesApi, reviewsApi } from "../services/api";
 import {
   BORROWING_TRANSACTION_STATE_LABELS,
   getLabel,
@@ -105,18 +107,7 @@ const summarizeTransactionRow = (tx) => {
     "\u0645\u0633\u062a\u0639\u064a\u0631";
     
   const lenderName =
-    tx?.lenderStudentName ||
-    tx?.lendingStudentName ||
-    tx?.LendingStudentName ||
-    tx?.lenderFullName ||
-    tx?.lenderName ||
-    tx?.ownerName ||
-    tx?.OwnerName ||
-    tx?.owner?.fullName ||
-    tx?.owner?.name ||
-    tx?.lender?.fullName ||
-    tx?.lender?.name ||
-    "\u0627\u0644\u0645\u0627\u0644\u0643";
+    tx?.lenderName || tx?.LenderName || tx?.lenderStudentName || tx?.lenderStudentFullName || tx?.ownerFullName || tx?.ownerName || tx?.OwnerName || tx?.LendingStudentName || tx?.LenderStudentName || tx?.lendingStudentName || tx?.lenderFullName || tx?.owner?.fullName || tx?.lender?.fullName || "\u0627\u0644\u0645\u0627\u0644\u0643";
 
   const author =
     b?.author ||
@@ -141,7 +132,13 @@ const summarizeTransactionRow = (tx) => {
     tx?.borrowingStudentId ||
     tx?.BorrowingStudentId ||
     tx?.borrowerId ||
+    tx?.BorrowerId ||
+    tx?.studentId ||
     tx?.StudentId ||
+    tx?.student?.id ||
+    tx?.student?.Id ||
+    tx?.borrower?.id ||
+    tx?.borrower?.Id ||
     "";
     
   const lenderId =
@@ -149,8 +146,15 @@ const summarizeTransactionRow = (tx) => {
     tx?.lendingStudentId ||
     tx?.LendingStudentId ||
     tx?.lenderId ||
-    tx?.OwnerId ||
+    tx?.LenderId ||
     tx?.ownerId ||
+    tx?.OwnerId ||
+    tx?.lenderStudentId ||
+    tx?.LenderStudentId ||
+    tx?.owner?.id ||
+    tx?.owner?.Id ||
+    tx?.lender?.id ||
+    tx?.lender?.Id ||
     "";
 
   const actDate =
@@ -279,6 +283,7 @@ const TransactionCard = ({
   isAdminView,
   isIncoming,
   onShowDetail,
+  onRate,
 }) => {
   const navigate = useNavigate();
   const s = summarizeTransactionRow(tx);
@@ -502,6 +507,23 @@ const TransactionCard = ({
                 </button>
               </div>
             )}
+
+          {/* تقييم المستعير - يظهر للمالك فقط عند الإرجاع */}
+          {isIncoming && (String(statusKey).toLowerCase() === "returned" || String(statusKey).toLowerCase() === "overdue") && (
+            <div className="pt-4 border-t border-library-primary/5 dark:border-white/5">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRate(tx);
+                }}
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-500/10 px-4 py-2 text-xs font-black text-amber-600 hover:bg-amber-500/20 transition-all"
+              >
+                <Star size={14} />
+                تقييم المستعير
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </motion.li>
@@ -516,6 +538,123 @@ const DetailRow = ({ label, value }) => (
     </span>
   </div>
 );
+
+const ReviewModal = ({ tx, onClose }) => {
+  const { user } = useAuth();
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (rating === 0) {
+      toast.error("يرجى اختيار تقييم قبل الإرسال");
+      return;
+    }
+    setLoading(true);
+    
+    try {
+      const s = summarizeTransactionRow(tx);
+      const reviewerId = user?.studentId || user?.id || user?.Id;
+      
+      // Determine who is being reviewed (the other party)
+      const reviewedId = String(reviewerId).toLowerCase() === String(s.borrowerId).toLowerCase() 
+        ? s.lenderId 
+        : s.borrowerId;
+
+      const body = {
+        reviewerStudentId: String(reviewerId),
+        reviewedStudentId: String(reviewedId),
+        borrowingTransactionId: String(s.id),
+        description: comment.trim() || "جيد",
+        rating: String(rating)
+      };
+
+      await reviewsApi.create(String(s.id), body);
+      toast.success("شكراً لتقييمك!");
+      onClose();
+    } catch (err) {
+      toast.error(err?.message || "فشل إرسال التقييم");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ scale: 0.9, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          className="bg-white dark:bg-[#121214] w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border border-white/10 relative overflow-hidden"
+          dir="rtl"
+        >
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 to-amber-600" />
+          
+          <button onClick={onClose} className="absolute top-6 left-6 text-gray-400 hover:text-library-primary transition-colors">
+            <X size={20} />
+          </button>
+
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Star size={32} className="text-amber-500" fill="currentColor" />
+            </div>
+            <h3 className="text-xl font-black text-library-primary dark:text-white">تقييم التجربة</h3>
+            <p className="text-sm font-bold text-gray-500 mt-1">كيف كانت تجربتك في استعارة هذا الكتاب؟</p>
+          </div>
+
+          <div className="flex justify-center gap-2 mb-8" dir="ltr">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                className="transition-transform hover:scale-110 active:scale-95"
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHover(star)}
+                onMouseLeave={() => setHover(0)}
+              >
+                <Star
+                  size={36}
+                  className={`${(hover || rating) >= star ? 'text-amber-500' : 'text-gray-200 dark:text-white/10'}`}
+                  fill={(hover || rating) >= star ? "currentColor" : "none"}
+                />
+              </button>
+            ))}
+          </div>
+
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="أضف تعليقاً حول تجربتك (اختياري)..."
+            className="w-full rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-4 text-sm font-bold outline-none focus:border-amber-500/50 transition-all min-h-[100px] mb-6 resize-none"
+          />
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex-1 bg-amber-500 text-white py-4 rounded-2xl font-black text-sm shadow-xl shadow-amber-500/20 hover:bg-amber-600 transition-all disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="animate-spin mx-auto" size={20} /> : "إرسال التقييم"}
+            </button>
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="flex-1 bg-gray-100 dark:bg-white/5 text-gray-500 py-4 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all"
+            >
+              تخطي
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 const TransactionDetailModal = ({ tx, loading, onClose }) => {
   useEffect(() => {
@@ -685,6 +824,7 @@ const BorrowingTransactions = () => {
   const [detailTx, setDetailTx] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [reviewTx, setReviewTx] = useState(null);
 
   const statusChips = useMemo(
     () => [
@@ -722,13 +862,7 @@ const BorrowingTransactions = () => {
             try {
               const bookData = await booksApi.getById(bookId);
               if (bookData) {
-                const ownerName =
-                  copyData.ownerName ||
-                  copyData.OwnerName ||
-                  copyData.studentName ||
-                  copyData.StudentName ||
-                  copyData.student?.fullName ||
-                  copyData.student?.name;
+                const ownerName = copyData.ownerName || copyData.OwnerName || copyData.ownerFullName || copyData.studentName || copyData.StudentName || copyData.student?.fullName || copyData.student?.name;
 
                 fullTx = {
                   ...fullTx,
@@ -868,7 +1002,7 @@ const BorrowingTransactions = () => {
     }
   };
 
-  const handleAction = async (id, actionFn, successMsg) => {
+  const handleAction = async (id, actionFn, successMsg, isReturnAction = false) => {
     setProcessingId(id);
     const t = toast.loading("جاري التنفيذ...");
     try {
@@ -876,6 +1010,12 @@ const BorrowingTransactions = () => {
       toast.success(successMsg, { id: t });
       await fetchTransactions();
       if (studentTx) await handleStudentSearch();
+      
+      // Show the review modal whenever a book is returned (only for lender)
+      if (isReturnAction && isIncoming) {
+        const fullTx = items.find(item => (item.id ?? item.Id) === id) || studentTx;
+        setReviewTx(fullTx);
+      }
     } catch (err) {
       toast.error(err?.message || "حدث خطأ أثناء التنفيذ", { id: t });
     } finally {
@@ -931,6 +1071,13 @@ const BorrowingTransactions = () => {
         loading={detailLoading}
         onClose={closeTransactionDetail}
       />
+
+      {reviewTx && (
+        <ReviewModal 
+          tx={reviewTx} 
+          onClose={() => setReviewTx(null)} 
+        />
+      )}
 
       <main className="relative z-10 pt-24 pb-12">
         <div className="absolute inset-0 opacity-40 dark:opacity-20 pointer-events-none overflow-hidden">
@@ -1095,15 +1242,17 @@ const BorrowingTransactions = () => {
                           id,
                           borrowingTransactionsApi.markReturned,
                           "تم تسجيل إرجاع الكتاب بنجاح",
+                          true
                         )
                       }
                       onLost={(id) =>
                         handleAction(
                           id,
                           borrowingTransactionsApi.markLost,
-                          "تم الإبلاغ عن فقدان الكتاب",
+                          "تم الإبلاغ عن فقدان الكتاب"
                         )
                       }
+                      onRate={(txData) => setReviewTx(txData)}
                     />
                   ))}
                 </ul>
@@ -1206,15 +1355,17 @@ const BorrowingTransactions = () => {
                             id,
                             borrowingTransactionsApi.markReturned,
                             "تم تسجيل إرجاع الكتاب بنجاح",
+                            true
                           )
                         }
                         onLost={(id) =>
                           handleAction(
                             id,
                             borrowingTransactionsApi.markLost,
-                            "تم الإبلاغ عن فقدان الكتاب",
+                            "تم الإبلاغ عن فقدان الكتاب"
                           )
                         }
+                        onRate={(txData) => setReviewTx(txData)}
                       />
                     </motion.div>
                   )}

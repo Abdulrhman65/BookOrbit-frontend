@@ -16,7 +16,7 @@ import {
   Star,
   Send
 } from "lucide-react";
-import { studentsApi, lendingApi, bookCopiesApi } from "../services/api";
+import { studentsApi, lendingApi, bookCopiesApi, reviewsApi } from "../services/api";
 import { API_V1, tokenStore } from "../utils/constants";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
@@ -32,6 +32,8 @@ const PublicProfile = () => {
   const [studentBooks, setStudentBooks] = useState([]);
   const [loadingBooks, setLoadingBooks] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -43,15 +45,28 @@ const PublicProfile = () => {
         const studentData = await studentsApi.getById(studentId);
         setStudent(studentData);
 
-        // 2. Fetch student's book copies via /students/{studentId}/books/copies
+        // 2. Fetch student's book copies and reviews
         setLoadingBooks(true);
-        const [copiesRes, lendingRes] = await Promise.all([
+        const [copiesRes, lendingRes, reviewsRes] = await Promise.all([
           bookCopiesApi.getByStudentId(studentId, { Page: 1, PageSize: 15 }),
-          lendingApi.getAll({ OwnerId: studentId, States: "available", PageSize: 50 })
+          lendingApi.getAll({ OwnerId: studentId, States: "available", PageSize: 50 }),
+          reviewsApi.getByStudentId(studentId).catch(() => [])
         ]);
 
         const copies = Array.isArray(copiesRes?.items) ? copiesRes.items : [];
         const lendingRecords = Array.isArray(lendingRes?.items) ? lendingRes.items : [];
+        const rawReviews = Array.isArray(reviewsRes) ? reviewsRes : (reviewsRes?.items || []);
+
+        // Enrich reviews with reviewer names
+        const uniqueIds = [...new Set(rawReviews.map(r => r.reviewerStudentId || r.ReviewerStudentId).filter(Boolean))];
+        const profileRes = await Promise.all(uniqueIds.map(id => studentsApi.getById(id).catch(() => null)));
+        const profileMap = Object.fromEntries(profileRes.filter(Boolean).map(p => [p.id || p.Id, p.fullName || p.name || p.Name]));
+        
+        const enriched = rawReviews.map(rev => ({
+          ...rev,
+          reviewerName: profileMap[rev.reviewerStudentId || rev.ReviewerStudentId] || "طالب مجهول"
+        }));
+        setReviews(enriched);
 
         // 3. Build a map: bookCopyId → lending record (for cost, days, etc.)
         const lendingByCopyId = {};
@@ -226,10 +241,10 @@ const PublicProfile = () => {
                     </p>
                   </div>
                   <div className="p-3 rounded-2xl bg-gray-50/50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
-                    <p className="text-[10px] font-black text-gray-400 uppercase mb-1">الكتب المعارة</p>
-                    <p className="text-lg font-black text-library-primary dark:text-white flex items-center justify-center gap-1.5">
-                      <BookOpen size={16} />
-                      {student.lendingsCount || 0}
+                    <p className="text-[10px] font-black text-gray-400 uppercase mb-1">التقييم</p>
+                    <p className="text-lg font-black text-amber-500 flex items-center justify-center gap-1.5">
+                      <Star size={16} fill="currentColor" />
+                      {student.averageRating || student.rating || (reviews.length > 0 ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) : "0.0")}
                     </p>
                   </div>
                 </div>
@@ -322,6 +337,63 @@ const PublicProfile = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Reviews Section */}
+          <div className="mt-16">
+            <h3 className="text-xl font-black text-library-primary dark:text-white flex items-center gap-3 mb-8">
+              <Star className="text-amber-500" size={24} fill="currentColor" />
+              تقييمات الزملاء
+            </h3>
+
+            {reviews.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {reviews.map((review, idx) => (
+                  <motion.div
+                    key={review.id || idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="bg-white/40 dark:bg-white/[0.02] rounded-3xl p-6 border border-white/10"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            size={14}
+                            className={s <= Number(review.rating || 0) ? "text-amber-500" : "text-gray-200 dark:text-white/5"}
+                            fill={s <= Number(review.rating || 0) ? "currentColor" : "none"}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-400">
+                        {review.createdAt ? new Date(review.createdAt).toLocaleDateString('ar-EG') : ""}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-library-primary/80 dark:text-gray-300 leading-relaxed italic">
+                      "{review.description || review.comment || review.content || "بدون تعليق"}"
+                    </p>
+                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                        <User size={14} className="text-indigo-500" />
+                      </div>
+                      <p className="text-[11px] font-black text-library-primary dark:text-white">
+                        {review.reviewerName || review.ReviewerName || review.reviewerStudentName || review.ReviewerStudentName || review.reviewer?.fullName || review.reviewer?.name || review.Reviewer?.FullName || review.Reviewer?.Name || "طالب مجهول"}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-12 text-center rounded-[2.5rem] border-2 border-dashed border-gray-100 dark:border-white/5 bg-white/20 dark:bg-white/[0.01]">
+                <div className="w-16 h-16 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-white/5">
+                  <Star className="text-gray-300 dark:text-white/20" size={28} />
+                </div>
+                <h4 className="text-base font-black text-library-primary dark:text-white">لا توجد تقييمات بعد</h4>
+                <p className="text-xs font-bold text-gray-500 mt-1">هذا الطالب لم يتلق أي تقييمات من الزملاء حتى الآن.</p>
+              </div>
+            )}
           </div>
         </div>
       </main>
