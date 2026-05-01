@@ -13,7 +13,8 @@ import {
   AlertCircle,
   Clock,
   ShieldCheck,
-  Star
+  Star,
+  Send
 } from "lucide-react";
 import { studentsApi, lendingApi, bookCopiesApi } from "../services/api";
 import { API_V1, tokenStore } from "../utils/constants";
@@ -232,6 +233,18 @@ const PublicProfile = () => {
                     </p>
                   </div>
                 </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02, translateY: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate(`/chat/${studentId}`, { state: { studentName: displayName, studentImage: profileImage || student.personalPhotoUrl } })}
+                  className="w-full py-4 bg-library-primary dark:bg-white text-white dark:text-library-primary rounded-2xl font-black text-sm shadow-xl shadow-library-primary/20 dark:shadow-white/5 hover:bg-library-accent dark:hover:bg-library-accent dark:hover:text-white transition-all flex items-center justify-center gap-3 group"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-white/20 dark:bg-library-primary/10 flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <Send size={16} />
+                  </div>
+                  مراسلة الآن
+                </motion.button>
               </motion.div>
             </div>
 
