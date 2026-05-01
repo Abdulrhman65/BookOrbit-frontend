@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, BookOpen, Shield, CheckCircle, UserPlus, Lock } from "lucide-react";
+import { ArrowRight, BookOpen, Shield, CheckCircle, UserPlus, Lock, X, BookMarked, Library } from "lucide-react";
 import toast from "react-hot-toast";
 import { identityApi } from "../services/api";
 
@@ -16,6 +16,7 @@ const AuthPage = () => {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [isWaitingConfirmation, setIsWaitingConfirmation] = useState(false);
   const [confirmedEmail, setConfirmedEmail] = useState("");
+  const [covenantCallback, setCovenantCallback] = useState(null);
 
   // Cross-tab communication for email verification
   useEffect(() => {
@@ -181,7 +182,12 @@ const AuthPage = () => {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <RegisterForm switchMode={switchMode} onSuccess={handleRegisterSuccess} onDark={false} />
+                  <RegisterForm 
+                    switchMode={switchMode} 
+                    onSuccess={handleRegisterSuccess} 
+                    onDark={false} 
+                    onShowCovenant={(cb) => setCovenantCallback(() => cb)}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -270,7 +276,12 @@ const AuthPage = () => {
                   key="register-mobile-placeholder"
                   className="lg:hidden"
                 >
-                  <RegisterForm switchMode={null} onSuccess={handleRegisterSuccess} onDark={false} />
+                  <RegisterForm 
+                    switchMode={null} 
+                    onSuccess={handleRegisterSuccess} 
+                    onDark={false} 
+                    onShowCovenant={(cb) => setCovenantCallback(() => cb)}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -280,7 +291,7 @@ const AuthPage = () => {
 
       {/* Desktop Sliding Overlay */}
       <motion.div
-        className="hidden lg:flex absolute top-0 bottom-0 w-1/2 bg-library-primary dark:bg-dark-bg z-20 items-center justify-center p-12 overflow-hidden"
+        className="hidden lg:flex absolute top-0 bottom-0 w-1/2 bg-library-primary dark:bg-dark-surface z-20 items-center justify-center p-12 overflow-hidden shadow-2xl dark:shadow-black/50 dark:border-x dark:border-white/5"
         initial={false}
         animate={{ left: isLogin ? "0%" : "50%" }}
         transition={{ type: "spring", stiffness: 180, damping: 26, mass: 0.9 }}
@@ -374,6 +385,116 @@ const AuthPage = () => {
           )}
         </AnimatePresence>
       </motion.div>
+
+      {/* Covenant of Integrity Modal */}
+      <AnimatePresence>
+        {covenantCallback && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setCovenantCallback(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative z-10 w-full max-w-4xl bg-library-paper dark:bg-dark-bg rounded-[2.5rem] p-6 md:p-10 shadow-2xl border border-white/10 overflow-hidden"
+            >
+              <button
+                onClick={() => setCovenantCallback(null)}
+                className="absolute top-6 left-6 w-10 h-10 rounded-2xl bg-white/5 hover:bg-red-500/10 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all border border-white/5 z-50"
+              >
+                <X size={20} />
+              </button>
+
+              
+
+              <div className="flex justify-center items-center py-8 scale-95 md:scale-110 min-h-[420px]">
+                <div className="perspective-container">
+                  <div className="book-wrapper animate-ultimate-float">
+                    <div className="book-3d">
+                      <div className="book-spine"></div>
+                      <div className="book-block-page">
+                        <div className="flex flex-col h-full relative z-10">
+                          <div className="border-b border-library-primary/10 pb-2 md:pb-4 mb-2 md:mb-4">
+                            <h5 className="text-[8px] md:text-[10px] font-black text-library-primary mb-1 italic">
+                              الأرشيف الجامعي
+                            </h5>
+                            <div className="h-0.5 w-6 md:w-8 bg-library-accent rounded-full accent-line"></div>
+                          </div>
+                          <p className="text-[7px] md:text-[9px] font-medium leading-relaxed md:leading-loose text-library-primary opacity-60">
+                            المعرفة هي الأمانة التي تزداد بالمشاركة. نحن نؤمن بأن كل طالب
+                            يمتلك مفتاحاً لنجاح زميل آخر. نظامنا صُمم ليكون جسراً آمناً يربط بين طلاب الجامعة ..
+                          </p>
+                          <div className="mt-auto pt-2 flex justify-between items-center text-library-accent/70 text-[7px] md:text-[8px] font-bold uppercase tracking-tighter">
+                            <span>Book Orbit</span>
+                            <span>Mansoura University</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="book-cover-pivot">
+                        <div className="cover-front flex flex-col justify-between p-5 md:p-8">
+                          <div className="text-library-accent text-[8px] md:text-[10px] font-bold tracking-[0.3em] uppercase mb-2 opacity-70">
+                            Book Orbit
+                          </div>
+                          <div className="flex-1 flex flex-col justify-center">
+                            <div className="w-8 md:w-10 h-0.5 bg-library-accent mb-4 md:mb-6 rounded-full accent-line"></div>
+                            <h2 className="text-xl md:text-3xl font-black text-library-paper leading-[1.1] tracking-tighter mb-2 md:mb-4">
+                              ميثاق <br />
+                              <span className="text-library-accent">الأمانة</span>
+                            </h2>
+                            <p className="text-library-paper/40 font-bold text-[7px] md:text-[9px] tracking-widest uppercase">
+                              حافظ على الكتب
+                            </p>
+                          </div>
+                          <div className="flex justify-between items-end opacity-40">
+                            <BookMarked size={20} className="text-white md:w-6 md:h-6" />
+                            <div className="text-[7px] md:text-[9px] font-bold text-white tracking-widest">
+                              Qurtuba Team
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="cover-back-page">
+                          <div className="w-full h-full border border-library-primary/5 p-4 md:p-6 flex flex-col justify-center text-center">
+                            <Library
+                              size={20}
+                              className="text-library-accent/40 mx-auto mb-2 md:mb-4"
+                            />
+                            <h5 className="text-[8px] md:text-[10px] font-bold text-library-primary mb-1 md:mb-2 italic">
+                              ميثاق شرف المنصة
+                            </h5>
+                            <p className="text-[7px] md:text-[9px] leading-relaxed text-library-primary/50 font-medium">
+                              "هذا الكتاب عهدة أمانة. حافظ عليه ليعود يوماً ما لرفوف الأرشيف, تطبق عقوبات على من يتلف الكتاب أو يتأخر عن موعد إرجاعه"
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <button
+                  onClick={() => {
+                    if (covenantCallback) covenantCallback();
+                    setCovenantCallback(null);
+                  }}
+                  className="w-full py-4 bg-library-primary dark:bg-white text-white dark:text-library-primary rounded-2xl font-black text-sm hover:shadow-xl transition-all"
+                >
+                  فهمت وأتعهد بالالتزام
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
+import ContactForm from "../components/common/ContactForm";
 
 // ─── Spring Reveal Component ────────────────────────────────────────────────
 const SpringReveal = ({ children, className = "", delay = 0 }) => {
@@ -68,12 +69,11 @@ const BookGraphic = () => (
             </div>
             <p className="text-[7px] md:text-[9px] font-medium leading-relaxed md:leading-loose text-library-primary opacity-60">
               المعرفة هي الأمانة التي تزداد بالمشاركة. نحن نؤمن بأن كل طالب
-              يمتلك مفتاحاً لنجاح زميل آخر. نظامنا صُمم ليكون جسراً آمناً يربط
-              بين جامعات مصر...
+              يمتلك مفتاحاً لنجاح زميل آخر. نظامنا صُمم ليكون جسراً آمناً يربط بين طلاب الجامعة ..
             </p>
-            <div className="mt-auto pt-2 flex justify-between items-center text-[7px] md:text-[8px] font-bold opacity-30 uppercase tracking-tighter">
-              <span>Cairo Ed.</span>
-              <span>P. 018</span>
+            <div className="mt-auto pt-2 flex justify-between items-center text-library-accent/70 text-[7px] md:text-[8px] font-bold uppercase tracking-tighter">
+              <span>Book Orbit</span>
+              <span>Mansoura University</span>
             </div>
           </div>
         </div>
@@ -81,22 +81,22 @@ const BookGraphic = () => (
         <div className="book-cover-pivot">
           <div className="cover-front flex flex-col justify-between p-5 md:p-8">
             <div className="text-library-accent text-[8px] md:text-[10px] font-bold tracking-[0.3em] uppercase mb-2 opacity-70">
-              تبادل
+              Book Orbit
             </div>
             <div className="flex-1 flex flex-col justify-center">
               <div className="w-8 md:w-10 h-0.5 bg-library-accent mb-4 md:mb-6 rounded-full accent-line"></div>
               <h2 className="text-xl md:text-3xl font-black text-library-paper leading-[1.1] tracking-tighter mb-2 md:mb-4">
-                تاريخ <br />
-                <span className="text-library-accent">العمارة</span>
+                ميثاق <br />
+                <span className="text-library-accent">الأمانة</span>
               </h2>
               <p className="text-library-paper/40 font-bold text-[7px] md:text-[9px] tracking-widest uppercase">
-                الأرشيف الأكاديمي
+                حافظ على الكتب
               </p>
             </div>
             <div className="flex justify-between items-end opacity-40">
               <BookMarked size={20} className="text-white md:w-6 md:h-6" />
               <div className="text-[7px] md:text-[9px] font-bold text-white tracking-widest">
-                VOL. IV
+                Qurtuba Team
               </div>
             </div>
           </div>
@@ -108,10 +108,10 @@ const BookGraphic = () => (
                 className="text-library-accent/40 mx-auto mb-2 md:mb-4"
               />
               <h5 className="text-[8px] md:text-[10px] font-bold text-library-primary mb-1 md:mb-2 italic">
-                ميثاق الأمان
+                ميثاق شرف المنصة
               </h5>
               <p className="text-[7px] md:text-[9px] leading-relaxed text-library-primary/50 font-medium">
-                "هذا الكتاب عهدة أمانة. حافظ عليه ليعود يوماً ما لرفوف الأرشيف."
+                "هذا الكتاب عهدة أمانة. حافظ عليه ليعود يوماً ما لرفوف الأرشيف, تطبق عقوبات على من يتلف الكتاب أو يتأخر عن موعد إرجاعه"
               </p>
             </div>
           </div>
@@ -123,9 +123,9 @@ const BookGraphic = () => (
 
 // ─── Contact Section ────────────────────────────────────────────────────────
 const ContactSection = () => (
-  <section className="py-16 md:py-20 bg-library-primary dark:bg-dark-bg relative overflow-hidden">
+  <section className="py-16 md:py-20 relative overflow-hidden">
     {/* Subtle radial glow */}
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-library-accent/[0.03] rounded-full blur-[120px] pointer-events-none" />
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-library-accent/[0.02] rounded-full blur-[120px] pointer-events-none" />
 
     <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
       <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-start">
@@ -134,12 +134,12 @@ const ContactSection = () => (
           <p className="text-library-accent text-[10px] font-bold uppercase tracking-[0.4em] mb-5">
             تواصل معنا
           </p>
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-5 leading-tight">
+          <h2 className="text-3xl md:text-4xl font-black text-library-primary dark:text-white mb-5 leading-tight">
             تواصل معنا.
           </h2>
-          <p className="text-base md:text-lg text-white/40 mb-12 max-w-md font-medium leading-relaxed">
+          <p className="text-base md:text-lg text-library-primary/60 dark:text-white/40 mb-12 max-w-md font-medium leading-relaxed">
             هل لديك استفسار أو اقتراح لتطوير الأرشيف؟ فريقنا دائماً هنا للاستماع
-            لطلابنا.
+            لرفاقنا.
           </p>
 
           <div className="space-y-5">
@@ -147,26 +147,26 @@ const ContactSection = () => (
               {
                 icon: Mail,
                 label: "البريد الإلكتروني",
-                value: "support@tabaadol.edu",
+                value: "book.orbit.web@gmail.com",
               },
               {
                 icon: MapPin,
                 label: "الموقع",
-                value: "الجامعات المصرية، القاهرة",
+                value: "كلية الحاسبات والمعلومات - جامعة المنصورة",
               },
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex items-center gap-5 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-library-accent/20 transition-all duration-300"
+                className="flex items-center gap-5 p-4 rounded-xl bg-white dark:bg-white/[0.03] backdrop-blur-md shadow-sm dark:shadow-none border border-library-primary/[0.06] dark:border-white/[0.06] hover:border-library-accent/30 transition-all duration-300 group"
               >
-                <div className="w-11 h-11 rounded-xl bg-library-accent/10 border border-library-accent/15 flex items-center justify-center text-library-accent flex-shrink-0">
+                <div className="w-11 h-11 rounded-xl bg-library-primary/[0.03] dark:bg-library-accent/10 border border-library-primary/5 dark:border-library-accent/15 flex items-center justify-center text-library-accent flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                   <item.icon size={18} />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-0.5">
+                  <p className="text-[10px] font-bold text-library-primary/40 dark:text-white/20 uppercase tracking-widest mb-0.5">
                     {item.label}
                   </p>
-                  <p className="text-white font-bold text-sm">{item.value}</p>
+                  <p className="text-library-primary dark:text-white font-bold text-sm">{item.value}</p>
                 </div>
               </div>
             ))}
@@ -175,40 +175,7 @@ const ContactSection = () => (
 
         {/* Right - Form */}
         <SpringReveal delay={0.15}>
-          <form className="space-y-4 p-7 md:p-9 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-            <div className="grid md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="الاسم"
-                className="contact-input"
-              />
-              <input
-                type="email"
-                placeholder="البريد الإلكتروني"
-                className="contact-input"
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="الموضوع"
-              className="contact-input"
-            />
-            <textarea
-              placeholder="رسالتك..."
-              rows="5"
-              className="contact-input resize-none"
-            ></textarea>
-            <button
-              type="submit"
-              className="w-full py-4 bg-library-accent text-library-primary font-black rounded-xl flex items-center justify-center gap-3 hover:bg-library-accent/90 transition-all group text-sm active:scale-[0.98]"
-            >
-              إرسال الرسالة
-              <Send
-                size={15}
-                className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-              />
-            </button>
-          </form>
+          <ContactForm />
         </SpringReveal>
       </div>
     </div>
@@ -259,23 +226,7 @@ const Home = () => {
     },
   ];
 
-  const features = [
-    {
-      icon: Shield,
-      title: "أمان أكاديمي",
-      desc: "كل حساب يخضع لمراجعة يدوية ضمان بيئة أكاديمية نقية وخالية من الهويات المجهولة.",
-    },
-    {
-      icon: Repeat,
-      title: "التسليم الذكي (OTP)",
-      desc: "رمز الـ OTP لا يتم تبادله إلا عند اللقاء الفعلي داخل الجامعة لضمان استلام الكتاب وتوثيقه.",
-    },
-    {
-      icon: GraduationCap,
-      title: "شبكة جامعية",
-      desc: "ربط طلاب من كافة الجامعات المصرية في منصة واحدة لتبادل المعرفة والمراجع بسلاسة.",
-    },
-  ];
+
 
   return (
     <div className="bg-texture min-h-screen relative selection:bg-library-accent/30 overflow-x-hidden">
@@ -345,124 +296,94 @@ const Home = () => {
           </div>
         </section>
 
-        {/* ════════════════════ FEATURES ════════════════════ */}
-        <section className="py-20 md:py-32">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* ════════════════════ HOW IT WORKS (BENTO GRID) ════════════════════ */}
+        <section className="py-20 md:py-32 relative overflow-hidden">
+          {/* Subtle Background Elements */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[600px] bg-library-accent/[0.02] rounded-full blur-[100px] pointer-events-none"></div>
+
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <SpringReveal className="text-center mb-14 md:mb-20">
               <p className="text-library-accent text-[10px] font-bold uppercase tracking-[0.4em] mb-4">
-                لماذا Tabaadol؟
+                BookOrbit
               </p>
-              <h2 className="text-3xl md:text-4xl font-black text-library-primary dark:text-library-paper mb-4 tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-black text-library-primary dark:text-white mb-4 tracking-tight">
                 بُنيت للطلاب، بأيدي الطلاب.
               </h2>
-              <p className="text-library-primary/50 dark:text-gray-400 text-base md:text-lg max-w-lg mx-auto font-medium">
-                كل تفصيلة صُممت لتوفير تجربة أكاديمية آمنة وسلسة.
+              <p className="text-library-primary/50 dark:text-white/50 text-base md:text-lg max-w-lg mx-auto font-medium">
+                بنيت المنصة لتضمن وصول الكتاب لمن يحتاجه، مع الحفاظ الكامل على الأمان الأكاديمي.
               </p>
             </SpringReveal>
 
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-              {features.map((feature, i) => (
-                <FeatureCard key={i} {...feature} delay={i * 0.1} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ════════════════════ STICKY STORY (How it Works) ════════════════════ */}
-        <section
-          ref={storyRef}
-          className="relative py-20 md:py-32 bg-library-primary text-library-paper dark:bg-dark-bg"
-        >
-          <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-16 md:gap-24 relative">
-              {/* Manual Sticky Visual via Framer Motion */}
-              <div className="hidden lg:block relative">
-                <motion.div style={{ y: yStory }} className="w-full">
-                  <SpringReveal>
-                    <div className="w-full aspect-square bg-white/[0.03] rounded-3xl border border-white/[0.06] flex flex-col items-center justify-center p-10 md:p-16">
-                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-library-accent/10 flex items-center justify-center mb-6 md:mb-8 border border-library-accent/20">
-                        <Repeat
-                          className="text-library-accent w-8 h-8 md:w-10 md:h-10"
-                          strokeWidth={1}
-                        />
-                      </div>
-                      <h3 className="text-2xl md:text-3xl font-black text-white mb-3 text-center">
-                        رحلة المعرفة
-                      </h3>
-                      <p className="text-library-paper/40 text-center text-sm md:text-base leading-relaxed max-w-xs font-medium">
-                        دورة تبادل مستمرة تضمن وصول الكتاب للطالب الذي يحتاجه في
-                        الوقت المناسب وبكل أمان.
-                      </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[auto]">
+              {/* Card 1: Network & Search (Span 2 cols on Desktop) */}
+              <SpringReveal delay={0} className="md:col-span-2">
+                <div className="h-full group p-8 md:p-10 rounded-3xl bg-white dark:bg-white/[0.03] border border-library-primary/[0.06] dark:border-white/[0.06] hover:border-library-accent/30 transition-all duration-500 card-lift overflow-hidden relative flex flex-col justify-end min-h-[320px] shadow-sm dark:shadow-none">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-library-accent/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 group-hover:bg-library-accent/20 transition-all duration-700"></div>
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-library-primary/[0.03] dark:bg-white/[0.05] flex items-center justify-center mb-6 border border-library-primary/5 dark:border-white/10 backdrop-blur-sm group-hover:scale-110 transition-transform duration-500">
+                      <GraduationCap size={28} className="text-library-accent" strokeWidth={1.5} />
                     </div>
-                  </SpringReveal>
-                </motion.div>
-              </div>
-
-              {/* Mobile version (non-sticky) */}
-              <div className="lg:hidden">
-                <SpringReveal>
-                  <div className="w-full aspect-square bg-white/[0.03] rounded-3xl border border-white/[0.06] flex flex-col items-center justify-center p-8 mb-12">
-                    <Repeat className="text-library-accent mb-6" size={40} />
-                    <h3 className="text-2xl font-black text-white mb-3 text-center">
-                      رحلة المعرفة
-                    </h3>
-                    <p className="text-library-paper/40 text-center text-sm leading-relaxed max-w-xs font-medium">
-                      دورة تبادل مستمرة تضمن وصول الكتاب للطالب الذي يحتاجه في
-                      الوقت المناسب وبكل أمان.
+                    <div className="inline-block px-3 py-1 bg-library-accent/10 text-library-accent font-bold mb-4 text-[10px] tracking-widest border border-library-accent/20 rounded-full">
+                      01. البحث والإيداع
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-black text-library-primary dark:text-white mb-3">شبكة جامعية متكاملة</h3>
+                    <p className="text-library-primary/60 dark:text-white/50 text-sm md:text-base leading-relaxed max-w-md font-medium">
+                      تصفح آلاف المراجع المتاحة في جامعتك، أو قم بإيداع مراجعك القديمة في الأرشيف الرقمي لتفيد بها مجتمعك الأكاديمي بسلاسة وسرعة.
                     </p>
                   </div>
-                </SpringReveal>
-              </div>
+                </div>
+              </SpringReveal>
 
-              {/* Story Steps */}
-              <div className="flex flex-col justify-center space-y-24 md:space-y-40 py-10 md:py-20">
-                <SpringReveal className="text-center lg:text-right">
-                  <div className="inline-block px-4 py-1.5 bg-library-accent/10 text-library-accent font-bold mb-6 text-[10px] tracking-widest border border-library-accent/15 rounded">
-                    01. البحث والإيداع
+              {/* Card 2: Security & Meetup (Span 1 col) */}
+              <SpringReveal delay={0.1} className="md:col-span-1">
+                <div className="h-full group p-8 md:p-10 rounded-3xl bg-white dark:bg-white/[0.03] border border-library-primary/[0.06] dark:border-white/[0.06] hover:border-library-accent/30 transition-all duration-500 card-lift relative flex flex-col justify-end min-h-[320px] overflow-hidden shadow-sm dark:shadow-none">
+                  <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-library-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-library-primary/[0.03] dark:bg-white/[0.05] flex items-center justify-center mb-6 border border-library-primary/5 dark:border-white/10 backdrop-blur-sm group-hover:scale-110 transition-transform duration-500">
+                      <Shield size={28} className="text-library-accent" strokeWidth={1.5} />
+                    </div>
+                    <div className="inline-block px-3 py-1 bg-library-accent/10 text-library-accent font-bold mb-4 text-[10px] tracking-widest border border-library-accent/20 rounded-full">
+                      02. التواصل الآمن
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-black text-library-primary dark:text-white mb-3">لقاء داخل الحرم</h3>
+                    <p className="text-library-primary/60 dark:text-white/50 text-sm leading-relaxed font-medium">
+                      بعد طلب الكتاب، تواصل عبر المنصة لتحديد موعد للمقابلة داخل الحرم الجامعي، لضمان بيئة موثوقة.
+                    </p>
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-black mb-5 leading-tight">
-                    أرشيفك بين يديك.
-                  </h2>
-                  <p className="text-base md:text-lg text-library-paper/40 leading-relaxed font-medium max-w-lg mx-auto lg:mr-0 lg:ml-0">
-                    تصفح آلاف المراجع المتاحة في جامعتك، أو قم بتصوير مراجعك
-                    القديمة وإيداعها في الأرشيف الرقمي لتفيد بها غيرك من الطلاب.
-                  </p>
-                </SpringReveal>
+                </div>
+              </SpringReveal>
 
-                <SpringReveal delay={0.1} className="text-center lg:text-right">
-                  <div className="inline-block px-4 py-1.5 bg-library-accent/10 text-library-accent font-bold mb-6 text-[10px] tracking-widest border border-library-accent/15 rounded">
-                    02. التواصل الآمن
+              {/* Card 3: Smart OTP (Span 3 cols) */}
+              <SpringReveal delay={0.2} className="md:col-span-3">
+                <div className="group p-8 md:p-12 rounded-3xl bg-gradient-to-br from-library-accent/5 to-white dark:from-library-accent/10 dark:to-library-primary/40 border border-library-accent/20 hover:border-library-accent/40 transition-all duration-500 card-lift relative overflow-hidden flex flex-col md:flex-row items-center gap-8 md:gap-12 shadow-sm dark:shadow-none">
+                  <div className="absolute inset-0 bg-black/[0.01] dark:bg-white/[0.01] mix-blend-overlay pointer-events-none"></div>
+                  <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-library-accent/10 dark:bg-library-accent/20 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none group-hover:bg-library-accent/20 dark:group-hover:bg-library-accent/30 transition-colors duration-700"></div>
+                  
+                  <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-full bg-library-accent/10 flex items-center justify-center border border-library-accent/20 relative z-10 group-hover:scale-105 transition-transform duration-500">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-library-accent flex items-center justify-center shadow-[0_0_20px_rgba(var(--color-accent-rgb),0.3)] dark:shadow-[0_0_40px_rgba(var(--color-accent-rgb),0.4)] group-hover:shadow-[0_0_30px_rgba(var(--color-accent-rgb),0.5)] dark:group-hover:shadow-[0_0_60px_rgba(var(--color-accent-rgb),0.6)] transition-shadow duration-500">
+                      <Repeat size={36} className="text-white dark:text-library-primary" strokeWidth={2} />
+                    </div>
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-black mb-5 leading-tight">
-                    لقاء داخل الحرم.
-                  </h2>
-                  <p className="text-base md:text-lg text-library-paper/40 leading-relaxed font-medium max-w-lg mx-auto lg:mr-0 lg:ml-0">
-                    بعد طلب الكتاب، تواصل مع زميلك من خلال المنصة لتحديد موعد
-                    للمقابلة داخل الحرم الجامعي، مما يضمن بيئة تبادل آمنة
-                    وموثقة.
-                  </p>
-                </SpringReveal>
-
-                <SpringReveal delay={0.2} className="text-center lg:text-right">
-                  <div className="inline-block px-4 py-1.5 bg-library-accent/10 text-library-accent font-bold mb-6 text-[10px] tracking-widest border border-library-accent/15 rounded">
-                    03. التوثيق الذكي
+                  
+                  <div className="relative z-10 text-center md:text-right flex-1">
+                    <div className="inline-block px-3 py-1 bg-library-accent/10 dark:bg-library-accent/20 text-library-accent font-bold mb-4 text-[10px] tracking-widest border border-library-accent/20 dark:border-library-accent/30 rounded-full">
+                      03. التوثيق الذكي
+                    </div>
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-library-primary dark:text-white mb-4">
+                      التسليم عبر رمز الـ OTP
+                    </h3>
+                    <p className="text-library-primary/70 dark:text-white/60 text-sm md:text-base leading-relaxed max-w-3xl font-medium">
+                      رمز الـ OTP لا يتم تبادله إلا عند اللقاء الفعلي. عند الاستلام، يتم تقديم رمز توثيق ذكي لمرة واحدة لضمان أن الكتاب قد وصل لصاحبه الجديد وتوثيق سجلات الأمانة الأكاديمية بنجاح. خطوة واحدة بسيطة تضمن حقوق الجميع.
+                    </p>
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-black mb-5 leading-tight">
-                    رمز الـ OTP.
-                  </h2>
-                  <p className="text-base md:text-lg text-library-paper/40 leading-relaxed font-medium max-w-lg mx-auto lg:mr-0 lg:ml-0">
-                    عند الاستلام، يتم تبادل رمز توثيق ذكي لمرة واحدة لضمان أن
-                    الكتاب قد وصل لصاحبه الجديد، مما يحافظ على سجلات دقيقة
-                    للأمانة الأكاديمية.
-                  </p>
-                </SpringReveal>
-              </div>
+                </div>
+              </SpringReveal>
             </div>
           </div>
         </section>
 
         {/* ════════════════════ DIGITAL SHELF ════════════════════ */}
-        <section className="py-20 md:py-32 bg-library-paper dark:bg-dark-bg overflow-hidden">
+        <section className="py-20 md:py-32 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             {/* Header */}
             <SpringReveal className="flex flex-col md:flex-row justify-between items-center md:items-end mb-14 md:mb-20 pb-10 border-b border-library-primary/[0.06] dark:border-white/[0.06] gap-6 text-center md:text-right">
@@ -479,7 +400,7 @@ const Home = () => {
               </div>
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-library-primary/[0.04] dark:bg-white/[0.04] text-library-primary dark:text-white font-bold rounded-xl hover:bg-library-accent hover:text-white transition-all text-sm"
+                className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white dark:bg-white/[0.04] text-library-primary dark:text-white font-bold rounded-xl border border-library-primary/[0.06] dark:border-white/[0.06] hover:border-library-accent/30 hover:bg-library-primary/[0.02] dark:hover:bg-white/[0.08] transition-all text-sm shadow-sm dark:shadow-none"
               >
                 تصفح الأرشيف <Lock size={14} />
               </Link>
@@ -502,13 +423,16 @@ const Home = () => {
                 >
                   <Link
                     to="/login"
-                    className="w-full aspect-[3/4] bg-library-primary dark:bg-dark-surface rounded-2xl relative overflow-hidden flex flex-col justify-between p-7 md:p-8 card-lift"
+                    className="w-full aspect-[3/4] bg-white dark:bg-white/[0.02] backdrop-blur-md border border-library-primary/[0.06] dark:border-white/[0.06] shadow-sm dark:shadow-none hover:border-library-accent/30 rounded-2xl relative overflow-hidden flex flex-col justify-between p-7 md:p-8 card-lift"
                   >
-                    <div className="text-library-paper/20 text-[10px] font-black uppercase tracking-[0.4em] relative z-10">
+                    {/* Hover Glow Background */}
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-library-accent/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/4 group-hover:bg-library-accent/15 transition-all duration-700"></div>
+
+                    <div className="text-library-primary/30 dark:text-library-paper/20 text-[10px] font-black uppercase tracking-[0.4em] relative z-10">
                       {book.cat}
                     </div>
                     <div className="relative z-10">
-                      <h3 className="text-lg md:text-xl font-black text-library-paper mb-1 leading-tight">
+                      <h3 className="text-lg md:text-xl font-black text-library-primary dark:text-library-paper mb-1 leading-tight group-hover:text-library-accent transition-colors duration-300">
                         {book.title}
                       </h3>
                       <p className="text-library-accent font-bold text-xs tracking-wider">
