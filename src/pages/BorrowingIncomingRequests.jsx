@@ -36,6 +36,8 @@ const borrowingNumToKey = {
   2: "Rejected",
   3: "Cancelled",
   4: "Expired",
+  5: "Delivered",
+  6: "Returned",
 };
 
 const statusTone = {
@@ -99,6 +101,7 @@ const BorrowingIncomingRequests = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [processingId, setProcessingId] = useState(null);
+  const [deliveredIds, setDeliveredIds] = useState(new Set());
   const [detailRequest, setDetailRequest] = useState(null);
   const [loadingDetailId, setLoadingDetailId] = useState(null);
   const [lendingRecordDetails, setLendingRecordDetails] = useState({});
@@ -159,11 +162,12 @@ const BorrowingIncomingRequests = () => {
     if (user && !isAdmin) fetchRequests();
   }, [fetchRequests, user, isAdmin]);
 
-  const handleAction = async (id, actionFn, successMsg) => {
+  const handleAction = async (id, actionFn, successMsg, isDeliver = false) => {
     setProcessingId(id);
     const t = toast.loading("جاري التنفيذ...");
     try {
       await actionFn(id);
+      if (isDeliver) setDeliveredIds((prev) => new Set([...prev, id]));
       toast.success(successMsg, { id: t });
       await fetchRequests();
     } catch (err) {
@@ -349,7 +353,11 @@ const BorrowingIncomingRequests = () => {
               {items.map((req) => {
                 const id = req.id ?? req.Id;
                 const rawSt = req.status ?? req.state;
-                const statusKey = typeof rawSt === "number" ? borrowingNumToKey[rawSt] || "Pending" : rawSt || "Pending";
+                let statusKey = typeof rawSt === "number" ? borrowingNumToKey[rawSt] || "Pending" : rawSt || "Pending";
+                if (typeof statusKey === "string") {
+                  statusKey = statusKey.charAt(0).toUpperCase() + statusKey.slice(1).toLowerCase();
+                  if (statusKey === "Approved") statusKey = "Accepted";
+                }
                 const statusAr = getLabel(BORROWING_REQUEST_STATE_LABELS, statusKey);
                 const title = req.bookTitle || req.BookTitle || "كتاب";
                 const studentName = req.studentName || req.borrowingStudentName || "طالب";
@@ -415,15 +423,22 @@ const BorrowingIncomingRequests = () => {
 
                       {statusKey === "Accepted" && (
                         <>
-                          <button
-                            type="button"
-                            disabled={isProcessing}
-                            onClick={() => handleAction(id, borrowingApi.deliver, "تم تسجيل تسليم الكتاب للطالب بنجاح.")}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-library-accent px-4 py-2 text-xs font-black text-white shadow-sm transition-all hover:bg-library-primary active:scale-95 disabled:opacity-50"
-                          >
-                            {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <Truck size={14} />}
-                            تأكيد تسليم الكتاب
-                          </button>
+                          {deliveredIds.has(id) ? (
+                            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-4 py-2 text-xs font-black text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                              <Truck size={14} />
+                              تم التسليم
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled={isProcessing}
+                              onClick={() => handleAction(id, borrowingApi.deliver, "تم تسجيل تسليم الكتاب للطالب بنجاح.", true)}
+                              className="inline-flex items-center gap-1.5 rounded-xl bg-library-accent px-4 py-2 text-xs font-black text-white shadow-sm transition-all hover:bg-library-primary active:scale-95 disabled:opacity-50"
+                            >
+                              {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <Truck size={14} />}
+                              تسليم
+                            </button>
+                          )}
                           <button
                             type="button"
                             disabled={loadingContactRecordId === rid || !rid}
@@ -433,15 +448,6 @@ const BorrowingIncomingRequests = () => {
                             {loadingContactRecordId === rid ? <Loader2 size={14} className="animate-spin" /> : <User size={14} />}
                             بيانات التواصل
                           </button>
-                          <button
-                            type="button"
-                            disabled={closingRecordId === rid || !rid}
-                            onClick={() => handleCloseListing(rid)}
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-black text-amber-700 transition-all hover:bg-amber-100 disabled:opacity-50 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-300"
-                          >
-                            {closingRecordId === rid ? <Loader2 size={14} className="animate-spin" /> : <CircleX size={14} />}
-                            إغلاق العرض
-                          </button>
                         </>
                       )}
 
@@ -449,9 +455,9 @@ const BorrowingIncomingRequests = () => {
                         <span className="inline-flex items-center gap-1 text-[11px] font-black text-gray-400 dark:text-gray-500 px-2 py-1">
                           {statusKey === "Rejected" ? <CircleX size={14} className="text-rose-400" /> : null}
                           {statusKey === "Cancelled" ? <CircleX size={14} className="text-orange-400" /> : null}
-                          {statusKey === "Borrowed" ? <CheckCircle2 size={14} className="text-blue-400" /> : null}
+                          {(statusKey === "Borrowed" || statusKey === "Delivered") ? <CheckCircle2 size={14} className="text-emerald-500" /> : null}
                           {statusKey === "Expired" ? <Hourglass size={14} /> : null}
-                          لا يوجد إجراء متاح
+                          {(statusKey === "Borrowed" || statusKey === "Delivered") ? "في عهدة المستعير" : "لا يوجد إجراء متاح"}
                         </span>
                       )}
                       <button

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { User, BookOpen, Layers, Repeat, ArrowUpRight, Sparkles, Clock3, ArrowDownToLine, ArrowUpToLine } from 'lucide-react';
+import { User, BookOpen, Layers, Repeat, ArrowUpRight, Sparkles, Clock3, ArrowDownToLine, ArrowUpToLine, Coins } from 'lucide-react';
 import Navbar from '../components/common/Navbar';
 import Aurora from '../components/effects/Aurora';
 import { useAuth } from '../context/AuthContext';
@@ -131,6 +131,13 @@ const StudentDashboard = () => {
                     تصميم جديد أسرع وأوضح لإدارة حسابك، متابعة الإعارات، والوصول لكل أدواتك من مكان واحد.
                   </p>
 
+                  <div className="mt-4 flex items-center justify-center lg:justify-start gap-4">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-library-accent/10 border border-library-accent/20">
+                      <Coins size={14} className="text-library-accent" />
+                      <span className="text-xs font-black text-library-primary dark:text-white">رصيدك: {user?.points || 0} نقطة</span>
+                    </div>
+                  </div>
+
                   <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
                     <Link to="/profile" className="px-4 py-2.5 rounded-xl bg-library-primary text-white text-xs font-black shadow-md hover:opacity-90 transition-all">
                       فتح الملف الشخصي
@@ -215,6 +222,13 @@ const StudentDashboard = () => {
                   <div className="h-2 rounded-full bg-emerald-100 dark:bg-emerald-900/20 overflow-hidden">
                     <div className="h-full w-[88%] bg-emerald-500 rounded-full" />
                   </div>
+                </div>
+                <div className="rounded-xl p-3 bg-indigo-500/5 border border-indigo-500/15">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[10px] font-black text-indigo-600">رصيد النقاط</p>
+                    <Coins size={14} className="text-indigo-600" />
+                  </div>
+                  <p className="text-sm font-black text-library-primary dark:text-white">{user?.points || 0} نقطة</p>
                 </div>
                 <div className="rounded-xl p-3 bg-indigo-500/5 border border-indigo-500/15">
                   <p className="text-[10px] font-black text-indigo-600 mb-1">حالة الأمان</p>

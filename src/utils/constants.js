@@ -1,6 +1,6 @@
 export const API_BASE_URL =
-  (process.env.REACT_APP_API_URL || "https://consumer-lizard-bodacious.ngrok-free.dev").replace(/\/+$/, "");
-export const API_V1 = `${API_BASE_URL}/api/v1.0`;
+  (process.env.REACT_APP_API_URL || "http://localhost:7240");
+export const API_V1 = `${API_BASE_URL}/api/v1`;
 
 // ─── Token Storage ───────────────────────────────────────────────────────────
 export const tokenStore = {
@@ -103,6 +103,10 @@ export const BOOK_COPY_CONDITION_LABELS = {
   LikeNew: "كالجديد",
   Acceptable: "مقبول",
   Poor: "متهالك",
+  0: "جديد",
+  1: "كالجديد",
+  2: "مقبول",
+  3: "متهالك",
 };
 
 export const BOOK_COPY_STATE_LABELS = {
@@ -112,6 +116,12 @@ export const BOOK_COPY_STATE_LABELS = {
   Lost: "مفقود",
   Damaged: "تالف",
   UnAvailable: "غير متاح",
+  0: "متاح",
+  1: "مستعار",
+  2: "محجوز",
+  3: "مفقود",
+  4: "تالف",
+  5: "غير متاح",
 };
 
 export const LENDING_STATE_LABELS = {

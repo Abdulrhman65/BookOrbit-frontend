@@ -29,7 +29,7 @@ import Navbar from "../components/common/Navbar";
 import { useAuth } from "../context/AuthContext";
 import { bookCopiesApi, lendingApi } from "../services/api";
 import { showReadableAccessErrorToast } from "../utils/accessMessages";
-import { API_BASE_URL, getBookImageUrl, tokenStore, BOOK_COPY_CONDITION_LABELS, getLabel } from "../utils/constants";
+import { API_BASE_URL, getBookImageUrl, tokenStore, BOOK_COPY_CONDITION_LABELS, BOOK_COPY_STATE_LABELS, getLabel } from "../utils/constants";
 
 const CONDITION_OPTIONS = Object.entries(BOOK_COPY_CONDITION_LABELS)
   .filter(([key]) => key[0] === key[0].toUpperCase())
@@ -811,9 +811,9 @@ const MyCopies = () => {
               <div className="space-y-2 text-xs font-bold text-gray-600 dark:text-gray-300">
                 <p>رقم النسخة: <span className="font-mono">#{selectedCopyDetails.id || selectedCopyDetails.Id}</span></p>
                 <p>رقم الكتاب: <span className="font-mono">#{selectedCopyDetails.bookId || selectedCopyDetails.BookId}</span></p>
-                <p>الحالة: {String(selectedCopyDetails.state ?? selectedCopyDetails.State ?? "—")}</p>
-                <p>الحالة الفيزيائية: {String(selectedCopyDetails.condition ?? selectedCopyDetails.Condition ?? "—")}</p>
-                <p>معروضة للإعارة: {String(Boolean(selectedCopyDetails.isListed ?? selectedCopyDetails.isOnLendingList ?? false) ? "نعم" : "لا")}</p>
+                <p>الحالة: <span className="font-bold">{getLabel(BOOK_COPY_STATE_LABELS, selectedCopyDetails.state ?? selectedCopyDetails.State)}</span></p>
+                <p>الحالة الفيزيائية: <span className="font-bold">{getLabel(BOOK_COPY_CONDITION_LABELS, selectedCopyDetails.condition ?? selectedCopyDetails.Condition)}</span></p>
+                <p>معروضة للإعارة: <span className="font-bold">{Boolean(selectedCopyDetails.isListed ?? selectedCopyDetails.isOnLendingList ?? false) ? "نعم" : "لا"}</span></p>
               </div>
               <button
                 type="button"

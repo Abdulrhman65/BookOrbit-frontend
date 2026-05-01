@@ -297,17 +297,17 @@ const AdminDashboard = () => {
     try {
       let list = [];
       let total = 1;
-      let params = { pageSize: 10, page: currentLendingPage };
       let res;
-      
+      let params = { pageSize: 10, page: currentLendingPage };
+
       if (subTab === "active" || subTab === "completed") {
         if (subTab === "active") params.states = [0, 2]; // Borrowed, Overdue
         else if (subTab === "completed") params.states = [1, 3]; // Returned, Lost
         res = await borrowingTransactionsApi.getAll(params);
       } else {
-        if (subTab === "pending_owner") params.States = [0]; // Pending
-        else if (subTab === "pending_handover") params.States = [1]; // Accepted
-        else if (subTab === "rejected") params.States = [2, 3, 4]; // Rejected, Cancelled, Expired
+        if (subTab === "pending_owner") params.states = [0]; // Pending
+        else if (subTab === "pending_handover") params.states = [1]; // Accepted
+        else if (subTab === "rejected") params.states = [2, 3, 4]; // Rejected, Cancelled, Expired
         res = await borrowingApi.getAll(params);
       }
       
@@ -2088,20 +2088,20 @@ const AdminDashboard = () => {
 
               <div className="col-span-3 flex items-center justify-center">
                 <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black border flex items-center gap-1.5 ${
-                  subTab === "active" ? 'bg-emerald-50 text-emerald-600 border-emerald-500/10 dark:bg-emerald-500/10 dark:text-emerald-400' : 
-                  subTab === "completed" ? 'bg-blue-50 text-blue-600 border-blue-500/10 dark:bg-blue-500/10 dark:text-blue-400' :
+                  (subTab === "active" || subTab === "completed") ? 'bg-emerald-50 text-emerald-600 border-emerald-500/10 dark:bg-emerald-500/10 dark:text-emerald-400' : 
                   subTab === "pending_owner" ? 'bg-amber-50 text-amber-600 border-amber-500/10 dark:bg-amber-500/10 dark:text-amber-400' : 
+                  subTab === "rejected" ? 'bg-rose-50 text-rose-600 border-rose-500/10 dark:bg-rose-500/10 dark:text-rose-400' :
                   'bg-blue-50 text-blue-600 border-blue-500/10 dark:bg-blue-500/10 dark:text-blue-400'
                 }`}>
                   <div className={`w-1.5 h-1.5 rounded-full ${
-                    subTab === "active" ? 'bg-emerald-500' : 
-                    subTab === "completed" ? 'bg-blue-500' :
-                    subTab === "pending_owner" ? 'bg-amber-500' : 'bg-blue-500'
+                    (subTab === "active" || subTab === "completed") ? 'bg-emerald-500' : 
+                    subTab === "pending_owner" ? 'bg-amber-500' : 
+                    subTab === "rejected" ? 'bg-rose-500' : 'bg-blue-500'
                   }`} />
                   {(() => {
                     const isTx = subTab === "active" || subTab === "completed";
                     const labels = isTx ? BORROWING_TRANSACTION_STATE_LABELS : BORROWING_REQUEST_STATE_LABELS;
-                    return getLabel(labels, lend.state ?? lend.status, isTx ? "نشطة" : (subTab === "pending_owner" ? 'بانتظار المالك' : 'بانتظار التسليم'));
+                    return getLabel(labels, lend.state ?? lend.status, isTx ? "نشطة" : (subTab === "pending_owner" ? 'بانتظار المالك' : (subTab === "rejected" ? 'مرفوضة' : (subTab === "completed" ? 'مكتملة' : 'بانتظار التسليم'))));
                   })()}
                 </span>
               </div>

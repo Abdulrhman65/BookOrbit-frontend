@@ -70,6 +70,10 @@ const summarizeTransactionRow = (tx) => {
     "\u0643\u062a\u0627\u0628 \u063a\u064a\u0631 \u0645\u0639\u0631\u0648\u0641";
 
   // Priority: 1. Full book object cover, 2. Transaction level cover
+  // Use the real ID from the enriched book object (which is a UUID)
+  const bookId = b?.id ?? b?.Id ?? tx?.bookId ?? tx?.BookId;
+
+  // Priority: 1. Full book object cover, 2. Transaction level cover, 3. getBookImageUrl fallback
   const rawCoverUrl =
     b?.bookCoverImageUrl ??
     b?.BookCoverImageUrl ??
@@ -79,10 +83,11 @@ const summarizeTransactionRow = (tx) => {
     tx?.CoverImageUrl ??
     "";
 
-  const displayCoverUrl = rawCoverUrl ? toApiAssetUrl(String(rawCoverUrl)) : "";
-
-  // Use the real ID from the enriched book object (which is a UUID)
-  const bookId = b?.id ?? b?.Id ?? tx?.bookId ?? tx?.BookId;
+  const displayCoverUrl = rawCoverUrl
+    ? toApiAssetUrl(String(rawCoverUrl))
+    : bookId
+    ? getBookImageUrl(bookId)
+    : "";
 
   const borrowerName =
     tx?.borrowerStudentName ||

@@ -13,7 +13,8 @@ import {
   Save,
   PencilLine,
   X,
-  Loader2
+  Loader2,
+  Coins
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/common/Navbar";
@@ -206,8 +207,8 @@ const StudentProfile = () => {
                   </div>
                   <div className="w-px h-6 bg-gray-100 dark:bg-white/5" />
                   <div className="text-center">
-                    <p className="text-[14px] font-black text-library-primary dark:text-white">5</p>
-                    <p className="text-[8px] text-gray-400 font-bold uppercase">كتبي الخاصة</p>
+                    <p className="text-[14px] font-black text-library-accent">{user?.points || 0}</p>
+                    <p className="text-[8px] text-gray-400 font-bold uppercase">نقاطي</p>
                   </div>
                 </div>
               )}
@@ -223,6 +224,13 @@ const StudentProfile = () => {
                 <div className="flex items-center justify-between rounded-xl px-3 py-2 bg-gray-50 dark:bg-white/5">
                   <p className="text-xs font-black text-gray-500">آخر تسجيل دخول</p>
                   <p className="text-xs font-black text-library-primary dark:text-white">اليوم</p>
+                </div>
+                <div className="flex items-center justify-between rounded-xl px-3 py-2 bg-indigo-500/5 border border-indigo-500/10">
+                  <div className="flex items-center gap-2">
+                    <Coins size={12} className="text-indigo-500" />
+                    <p className="text-xs font-black text-indigo-600">رصيد النقاط</p>
+                  </div>
+                  <p className="text-xs font-black text-indigo-600">{user?.points || 0}</p>
                 </div>
                 <div className="flex items-center justify-between rounded-xl px-3 py-2 bg-gray-50 dark:bg-white/5">
                   <p className="text-xs font-black text-gray-500">الأمان</p>

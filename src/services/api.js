@@ -693,10 +693,10 @@ export const lendingApi = {
   getContactInfo: (lendingListRecordId) =>
     apiRequest(`/lendinglist/${lendingListRecordId}/contact-info`),
 
-  /** POST /lendinglist/{lendingListRecordId}/close */
+  /** PATCH /lendinglist/{lendingListRecordId}/close */
   close: (lendingListRecordId) =>
     apiRequest(`/lendinglist/${lendingListRecordId}/close`, {
-      method: "POST",
+      method: "PATCH",
     }),
 };
 
