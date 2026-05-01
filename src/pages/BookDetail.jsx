@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, User, Building, Hash, CopyPlus, ArrowRight, Loader2, AlertCircle, CalendarDays, Coins, Repeat } from "lucide-react";
 import { booksApi, bookCopiesApi, lendingApi, borrowingApi } from "../services/api";
@@ -40,7 +40,12 @@ const BookCopyCard = ({ record, isProcessing, onBorrow }) => {
           </div>
           <div>
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">صاحب النسخة</p>
-            <p className="text-sm font-black text-library-primary dark:text-white">{record.studentName || record.ownerName || copy?.studentName || "زميل"}</p>
+            <Link 
+              to={`/student/${record.studentId || record.ownerId || record.OwnerId}`}
+              className="text-sm font-black text-library-primary dark:text-white hover:text-library-accent transition-colors"
+            >
+              {record.studentName || record.ownerName || copy?.studentName || "زميل"}
+            </Link>
           </div>
         </div>
         

@@ -22,6 +22,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import EmailVerified from './redirects/EmailVerified';
 import ResetPassword from './redirects/ResetPassword';
 import Notifications from './pages/Notifications';
+import PublicProfile from './pages/PublicProfile';
 
 // Effects
 import Preloader from './components/effects/Preloader';
@@ -115,6 +116,7 @@ function AppRoutes() {
               <Route path="/lending/transactions/:type" element={<ProtectedRoute><BorrowingTransactions /></ProtectedRoute>} />
               <Route path="/addbook" element={<ProtectedRoute><AddBook /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+              <Route path="/student/:studentId" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
 
               {/* ── Admin Protected Routes (محمية) ── */}
               <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

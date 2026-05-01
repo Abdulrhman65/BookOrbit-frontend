@@ -10,7 +10,7 @@ import {
   ArrowUpRight,
   TrendingUp,
   BookMarked,
-  CheckCircle2,
+  CheckCircle,
   Shield,
   Search,
   Loader2,
@@ -1185,7 +1185,7 @@ const AdminDashboard = () => {
                     disabled={processingBookId === selectedBook.id}
                     className="w-full py-3 rounded-xl bg-emerald-500 text-white text-[11px] font-black hover:bg-emerald-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm shadow-emerald-500/20"
                   >
-                    <CheckCircle2 size={16} />
+                    <CheckCircle size={16} />
                     اعتماد الكتاب
                   </button>
                   <button
@@ -2264,7 +2264,7 @@ const AdminDashboard = () => {
       icon: Users, 
       color: "indigo",
       subTabs: [
-        { id: "verified", title: "الموثقون", icon: CheckCircle2 },
+        { id: "verified", title: "الموثقون", icon: CheckCircle },
         { id: "all", title: "كل الطلاب", icon: Users },
         { id: "pending_approval", title: "انتظار الموافقة", icon: Clock },
         { id: "pending_verification", title: "انتظار التوثيق", icon: UserPlus },
@@ -2289,11 +2289,11 @@ const AdminDashboard = () => {
       icon: BookMarked, 
       color: "amber",
       subTabs: [
-        { id: "active", title: "نشطة", icon: CheckCircle2 },
+        { id: "active", title: "نشطة", icon: CheckCircle },
         { id: "pending_owner", title: "بانتظار القبول", icon: Clock },
         { id: "pending_handover", title: "تم القبول", icon: Check },
         { id: "rejected", title: "مرفوضة", icon: XCircle },
-        { id: "completed", title: "مكتملة", icon: CheckCircle2 }
+        { id: "completed", title: "مكتملة", icon: CheckCircle }
       ]
     }
   ];

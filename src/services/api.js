@@ -67,10 +67,13 @@ export const normalizeStudent = (student = {}) => {
     id: student.Id || student.id || student.StudentId || student.studentId,
     fullName: student.fullName || student.name || student.Name || "طالب",
     name: student.name || student.Name || student.fullName,
-    universityMailAddress: student.universityMailAddress || student.UniversityMailAddress || "",
+    universityMailAddress: student.universityMailAddress || student.UniversityMailAddress || student.email || student.Email || "",
+    email: student.email || student.Email || student.universityMailAddress || student.UniversityMailAddress || "",
     phoneNumber: student.phoneNumber || student.PhoneNumber || "",
     telegramUserId: student.telegramUserId || student.TelegramUserId || "",
+    personalPhotoUrl: toApiAssetUrl(student.personalPhotoUrl || student.PersonalPhotoUrl || student.image || student.Image || ""),
     points: student.points ?? student.Points ?? 0,
+    lendingsCount: student.lendingsCount ?? student.LendingsCount ?? 0,
     status: status,
     state: stateValue ?? status,
     creationDate: student.creationDate || student.joinDate || student.JoinDate,
@@ -146,8 +149,36 @@ const normalizeBook = (book = {}) => {
       };
     } catch (err) {
       console.error("Error normalizing book:", err, book);
-      return { ...book, id: book?.id || Math.random(), title: "خطأ في البيانات" };
     }
+};
+
+export const normalizeBookCopy = (row = {}) => {
+  const id = row.Id ?? row.id;
+  const bookId = row.BookId ?? row.bookId ?? row.book?.Id ?? row.book?.id;
+  const book = row.book ?? row.Book ?? {};
+  
+  // Handle lending data if embedded
+  const lending = row.lendingRecord || row.LendingRecord || row.lendingListRecord || row.LendingListRecord || null;
+  
+  return {
+    ...row,
+    id,
+    bookId,
+    title: book.title || book.Title || row.bookTitle || row.BookTitle || row.title || "كتاب",
+    authorName: book.author || book.Author || row.authorName || row.AuthorName || "مؤلف مجهول",
+    condition: row.condition ?? row.Condition ?? 0,
+    state: row.state ?? row.State,
+    isOnLendingList: Boolean(row.isOnLendingList ?? row.IsOnLendingList ?? lending),
+    cost: lending?.cost ?? lending?.Cost ?? row.cost ?? row.Cost ?? 0,
+    borrowingDurationInDays: lending?.borrowingDurationInDays ?? lending?.BorrowingDurationInDays ?? row.borrowingDurationInDays ?? row.BorrowingDurationInDays ?? 0,
+    bookCoverImageUrl: toApiAssetUrl(
+      book.bookCoverImageUrl || 
+      book.BookCoverImageUrl || 
+      row.bookCoverImageUrl || 
+      row.BookCoverImageUrl || 
+      (bookId ? getBookImageUrl(bookId) : "")
+    ),
+  };
 };
 
 const normalizeBorrowingRequest = (request = {}) => {
@@ -163,7 +194,11 @@ const normalizeBorrowingRequest = (request = {}) => {
     id: request.Id || request.id,
     lendingRecordId: request.LendingRecordId || request.lendingRecordId || request.lendingListRecordId,
     studentName: request.studentName || request.borrowingStudentName || request.BorrowingStudentName || "",
+    studentId: request.studentId || request.borrowingStudentId || request.BorrowingStudentId || request.StudentId || "",
+    lenderName: request.lenderName || request.LenderName || "",
+    lenderId: request.lenderId || request.LenderId || request.ownerId || request.OwnerId || "",
     bookTitle: request.bookTitle || request.BookTitle || "",
+    bookId: request.bookId || request.BookId || "",
     requestDate: request.requestDate || request.createdAtUtc || request.createdAt || request.createdAtUTC,
     expectedReturnDate: request.expectedReturnDate || request.expirationDateUtc || request.expirationDate,
     returnDate: request.returnDate || request.expirationDateUtc || request.expirationDate,
@@ -510,9 +545,9 @@ export const studentsApi = {
     return normalizeStudent(res);
   },
   
-  /** GET /students/{studentId} — Student by ID */
+  /** GET /students/profiles/{studentId} — Student profile by ID */
   getById: async (studentId) => {
-    const res = await apiRequest(`/students/${studentId}`);
+    const res = await apiRequest(`/students/profiles/${studentId}`);
     return normalizeStudent(res);
   },
   
@@ -637,9 +672,11 @@ export const bookCopiesApi = {
   },
 
   /** GET /students/{studentId}/books/copies — Copies by student ID */
-  getByStudentId: (studentId, params = {}) => {
+  getByStudentId: async (studentId, params = {}) => {
     const query = buildQuery(params);
-    return apiRequest(`/students/${studentId}/books/copies?${query}`);
+    const res = await apiRequest(`/students/${studentId}/books/copies?${query}`);
+    const items = Array.isArray(res?.items) ? res.items.map(normalizeBookCopy) : [];
+    return { ...res, items, data: items };
   },
 
   /** GET /books/copies — All copies (paginated) */
@@ -675,7 +712,12 @@ export const lendingApi = {
           ...item,
           id: item.Id || item.id,
           bookTitle: item.bookTitle || item.title || item.Title || "",
-          studentName: item.studentName || item.ownerName || item.OwnerName || "",
+          authorName: item.authorName || item.author || item.AuthorName || item.Author || "مؤلف مجهول",
+          studentName: item.studentName || item.ownerName || item.OwnerName || item.StudentName || "",
+          studentId: item.studentId || item.ownerId || item.OwnerId || item.StudentId || "",
+          cost: item.cost ?? item.Cost ?? 0,
+          borrowingDurationInDays: item.borrowingDurationInDays ?? item.BorrowingDurationInDays ?? item.duration ?? 0,
+          bookCoverImageUrl: toApiAssetUrl(item.bookCoverImageUrl || item.BookCoverImageUrl || item.coverUrl || item.CoverUrl || "")
         }))
       : [];
     return {

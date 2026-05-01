@@ -4,22 +4,22 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import {
   Search,
   Loader2,
   RefreshCcw,
-  Clock3,
+  Clock,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   ListChecks,
   User,
-  BookX,
-  AlertTriangle,
-  ArrowDownToLine,
+  XCircle,
+  AlertCircle,
+  ArrowDown,
   Hash,
   Repeat,
   BookOpen,
@@ -49,6 +49,7 @@ const transactionNumToKey = {
 
 /** Builds all display fields shared by cards and the detail modal */
 const summarizeTransactionRow = (tx) => {
+  if (!tx) return {};
   const b = tx?.book ?? tx?.Book ?? tx?.bookDto ?? tx?.BookDto;
   const id = tx?.id ?? tx?.Id;
   let rawSt = tx?.status ?? tx?.state;
@@ -135,6 +136,23 @@ const summarizeTransactionRow = (tx) => {
     tx?.expirationDateUtc ||
     tx?.expirationDate;
     
+  const borrowerId =
+    tx?.borrowerStudentId ||
+    tx?.borrowingStudentId ||
+    tx?.BorrowingStudentId ||
+    tx?.borrowerId ||
+    tx?.StudentId ||
+    "";
+    
+  const lenderId =
+    tx?.lenderStudentId ||
+    tx?.lendingStudentId ||
+    tx?.LendingStudentId ||
+    tx?.lenderId ||
+    tx?.OwnerId ||
+    tx?.ownerId ||
+    "";
+
   const actDate =
     tx?.actualReturnDate ||
     tx?.ActualReturnDate ||
@@ -148,6 +166,8 @@ const summarizeTransactionRow = (tx) => {
     bookId, // UUID for /catalog/:id
     borrowerName,
     lenderName,
+    borrowerId,
+    lenderId,
     author,
     isbn,
     expDate,
@@ -269,6 +289,8 @@ const TransactionCard = ({
     bookId,
     borrowerName,
     lenderName,
+    borrowerId,
+    lenderId,
     expDate,
     actDate,
     displayCoverUrl,
@@ -375,9 +397,13 @@ const TransactionCard = ({
                   <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">
                     المالك
                   </p>
-                  <p className="text-xs font-black text-library-primary dark:text-white truncate">
+                  <Link 
+                    to={`/student/${lenderId}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs font-black text-library-primary dark:text-white truncate hover:text-library-accent transition-colors"
+                  >
                     {lenderName}
-                  </p>
+                  </Link>
                 </div>
               </div>
               <div className="flex items-center gap-2.5">
@@ -391,9 +417,13 @@ const TransactionCard = ({
                   <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">
                     المستعير
                   </p>
-                  <p className="text-xs font-black text-library-primary dark:text-white truncate">
+                  <Link 
+                    to={`/student/${borrowerId}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs font-black text-library-primary dark:text-white truncate hover:text-library-accent transition-colors"
+                  >
                     {borrowerName}
-                  </p>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -401,7 +431,7 @@ const TransactionCard = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-library-primary/5 flex items-center justify-center shrink-0">
-                  <Clock3
+                  <Clock
                     size={14}
                     className="text-library-primary/40 dark:text-gray-400"
                   />
@@ -452,7 +482,7 @@ const TransactionCard = ({
                   {processing ? (
                     <Loader2 size={14} className="animate-spin" />
                   ) : (
-                    <ArrowDownToLine size={14} />
+                    <ArrowDown size={14} />
                   )}
                   إرجاع الكتاب
                 </button>
@@ -466,7 +496,7 @@ const TransactionCard = ({
                   {processing ? (
                     <Loader2 size={14} className="animate-spin" />
                   ) : (
-                    <BookX size={14} />
+                    <XCircle size={14} />
                   )}
                   الإبلاغ كفقدان
                 </button>
@@ -908,7 +938,6 @@ const BorrowingTransactions = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Header Dashboard Style */}
           <header className="mb-10">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <motion.div
@@ -1133,7 +1162,7 @@ const BorrowingTransactions = () => {
 
                 <div className="mt-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10">
                   <div className="flex gap-2 mb-2">
-                    <AlertTriangle
+                    <AlertCircle
                       size={14}
                       className="text-amber-600 shrink-0 mt-0.5"
                     />

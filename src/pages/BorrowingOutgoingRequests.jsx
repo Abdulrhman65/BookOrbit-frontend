@@ -6,16 +6,15 @@ import {
   Search,
   Loader2,
   Send,
-  Clock3,
+  Clock,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   ListChecks,
   X,
   User,
-  Hourglass,
-  CheckCircle2,
-  CircleX
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
@@ -351,7 +350,7 @@ const BorrowingOutgoingRequests = () => {
                         <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-2">
                           <div className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200/80 bg-white/80 px-2 py-1 dark:border-white/10 dark:bg-white/[0.03]">
                             <User size={12} className="text-library-accent" />
-                            <span>صاحب النسخة: <strong className="text-library-primary dark:text-white font-black">{ownerName}</strong></span>
+                            <span>صاحب النسخة: <Link to={`/student/${req.lenderId}`} className="text-library-primary dark:text-white font-black hover:text-library-accent transition-colors">{ownerName}</Link></span>
                           </div>
                           {rid ? <span className="font-mono text-[10px] opacity-70">رقم العرض: #{rid}</span> : null}
                         </div>
@@ -386,10 +385,10 @@ const BorrowingOutgoingRequests = () => {
 
                         {statusKey !== "Pending" && statusKey !== "Accepted" && (
                           <span className="inline-flex items-center gap-1 text-[11px] font-black text-gray-400 dark:text-gray-500 px-2 py-1">
-                            {statusKey === "Rejected" ? <CircleX size={14} className="text-rose-400" /> : null}
-                            {statusKey === "Cancelled" ? <CircleX size={14} className="text-orange-400" /> : null}
-                            {statusKey === "Borrowed" ? <CheckCircle2 size={14} className="text-blue-400" /> : null}
-                            {statusKey === "Expired" ? <Hourglass size={14} /> : null}
+                            {statusKey === "Rejected" ? <XCircle size={14} className="text-rose-400" /> : null}
+                            {statusKey === "Cancelled" ? <XCircle size={14} className="text-orange-400" /> : null}
+                            {statusKey === "Borrowed" ? <CheckCircle size={14} className="text-blue-400" /> : null}
+                            {statusKey === "Expired" ? <Clock size={14} /> : null}
                             لا يوجد إجراء متاح
                           </span>
                         )}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, BookOpen, Shield, CheckCircle2, UserPlus, Lock } from "lucide-react";
+import { ArrowRight, BookOpen, Shield, CheckCircle, UserPlus, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { identityApi } from "../services/api";
 
@@ -99,7 +99,7 @@ const AuthPage = () => {
         className="text-center py-6 bg-gray-50/50 dark:bg-black/20 rounded-3xl p-8 backdrop-blur-md border border-gray-100 dark:border-white/10 shadow-sm"
       >
         <div className="w-20 h-20 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/10">
-          <CheckCircle2 size={40} className="text-emerald-500" />
+          <CheckCircle size={40} className="text-emerald-500" />
         </div>
         <h3 className="text-2xl font-black text-library-primary dark:text-white mb-3">
           تحقق من بريدك الجامعي

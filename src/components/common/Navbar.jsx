@@ -12,8 +12,7 @@ import {
   Bell,
   Shield,
   BookOpen,
-  UserCircle,
-  House,
+  Home,
   Inbox,
   Send,
   RefreshCcw,
@@ -132,7 +131,7 @@ const Navbar = () => {
                       className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/70 dark:bg-white/5 border border-library-primary/10 dark:border-white/10 text-[11px] font-black text-library-primary dark:text-white hover:border-library-accent/35 hover:text-library-accent transition-all"
                       title="الصفحة الرئيسية"
                     >
-                      <House size={14} />
+                      <Home size={14} />
                       الرئيسية
                     </Link>
                   )}
@@ -301,7 +300,7 @@ const Navbar = () => {
                       className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/70 dark:bg-white/5 border border-library-primary/10 dark:border-white/10 text-[11px] font-black text-library-primary dark:text-white hover:border-library-accent/35 hover:text-library-accent transition-all"
                       title="الصفحة الرئيسية"
                     >
-                      <House size={14} />
+                      <Home size={14} />
                       الرئيسية
                     </Link>
                   )}
@@ -418,7 +417,7 @@ const Navbar = () => {
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-library-accent/20 to-library-accent/5 text-library-accent flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-                            <House size={20} />
+                            <Home size={20} />
                           </div>
                           الصفحة الرئيسية
                         </div>
@@ -446,7 +445,7 @@ const Navbar = () => {
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 text-indigo-500 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-                            <UserCircle size={20} />
+                            <User size={20} />
                           </div>
                           حسابي الشخصي
                         </div>

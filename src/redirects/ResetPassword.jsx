@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock,
-  CheckCircle2,
+  CheckCircle,
   Eye,
   EyeOff,
   AlertCircle,
@@ -138,7 +138,7 @@ const ResetPassword = () => {
                 className="text-center py-8"
               >
                 <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 size={40} className="text-emerald-500" />
+                  <CheckCircle size={40} className="text-emerald-500" />
                 </div>
                 <h2 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-6">
                   تم بنجاح!
