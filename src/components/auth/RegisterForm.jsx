@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Camera, Eye, EyeOff, Loader2, UserPlus } from "lucide-react";
+import { Camera, Eye, EyeOff, Loader2, UserPlus, BookOpen, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 
-const RegisterForm = ({ switchMode, onSuccess }) => {
+const RegisterForm = ({ switchMode, onSuccess, onShowCovenant }) => {
   const { register } = useAuth();
 
   const [registerData, setRegisterData] = useState({
@@ -202,7 +203,7 @@ const RegisterForm = ({ switchMode, onSuccess }) => {
       newErrors.PhoneNumber = "يجب إدخال رقم الهاتف أو يوزر تليجرام على الأقل";
     }
     if (!registerData.agreeToTerms) {
-      newErrors.agreeToTerms = "يجب الموافقة على ميثاق الشرف";
+      newErrors.agreeToTerms = "يجب الموافقة على ميثاق الأمانة";
     }
     if (!photo) {
       newErrors.PersonalPhoto = "الصورة الشخصية مطلوبة";
@@ -505,7 +506,17 @@ const RegisterForm = ({ switchMode, onSuccess }) => {
             className="text-[11px] text-library-primary/50 dark:text-gray-400 font-black leading-relaxed cursor-pointer select-none text-right"
           >
             أقر بصحة بياناتي وأوافق على{" "}
-            <span className="text-library-accent">ميثاق شرف المنصة</span>،
+            <span 
+              className="text-library-accent hover:underline decoration-dotted underline-offset-4 transition-all"
+              onClick={(e) => {
+                e.preventDefault();
+                onShowCovenant(() => {
+                  setRegisterData(p => ({ ...p, agreeToTerms: true }));
+                });
+              }}
+            >
+              ميثاق الأمانة
+            </span>،
             وأتعهد بالمحافظة على الكتب المعارة لي.
           </label>
           <input
@@ -535,6 +546,7 @@ const RegisterForm = ({ switchMode, onSuccess }) => {
           )}
         </button>
       </form>
+
       {switchMode && (
         <p className="mt-4 text-center text-library-primary/30 dark:text-gray-500 text-[10px] font-black pb-4 uppercase tracking-widest">
           لديك حساب موثق؟{" "}

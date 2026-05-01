@@ -304,6 +304,26 @@ const Navbar = () => {
                       الرئيسية
                     </Link>
                   )}
+
+                  <motion.button
+                    whileHover={{ scale: 1.1, rotate: 15 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={toggleDarkMode}
+                    className="hidden lg:flex w-9 h-9 rounded-lg items-center justify-center bg-white/60 dark:bg-white/5 text-library-primary/70 dark:text-library-paper/60 hover:text-library-accent transition-all border border-library-primary/10 dark:border-white/10"
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={isDarkMode ? "sun" : "moon"}
+                        initial={{ scale: 0.5, opacity: 0, rotate: -90 }}
+                        animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                        exit={{ scale: 0.5, opacity: 0, rotate: 90 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {isDarkMode ? <Sun size={17} /> : <Moon size={17} />}
+                      </motion.div>
+                    </AnimatePresence>
+                  </motion.button>
+
                   <Link
                     to="/login"
                     className="text-sm font-black text-library-primary/60 dark:text-library-paper/60 hover:text-library-accent transition-colors"
