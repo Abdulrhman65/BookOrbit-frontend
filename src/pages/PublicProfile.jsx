@@ -48,8 +48,8 @@ const PublicProfile = () => {
         // 2. Fetch student's book copies and reviews
         setLoadingBooks(true);
         const [copiesRes, lendingRes, reviewsRes] = await Promise.all([
-          bookCopiesApi.getByStudentId(studentId, { Page: 1, PageSize: 15 }),
-          lendingApi.getAll({ OwnerId: studentId, States: "available", PageSize: 50 }),
+          bookCopiesApi.getByStudentId(studentId, { Page: 1, PageSize: 50 }),
+          lendingApi.getAll({ StudentId: studentId, States: "available", PageSize: 50 }),
           reviewsApi.getByStudentId(studentId).catch(() => [])
         ]);
 

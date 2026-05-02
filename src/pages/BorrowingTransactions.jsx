@@ -1058,16 +1058,24 @@ const BorrowingTransactions = () => {
     }
 
     setIsOtpVerifying(true);
-    const t = toast.loading("جاري التحقق من الرمز وإرجاع الكتاب...");
+    const t = toast.loading("جاري التحقق من الرمز وإكمال العملية...");
     try {
       await borrowingTransactionsApi.return(otpTargetId, otpValue);
-      toast.success("تم إرجاع الكتاب بنجاح!", { id: t });
+      
+      // ✅ If we reached here, the API call was successful
+      toast.success("تم تنفيذ العملية بنجاح!", { id: t });
       setShowOtpModal(false);
       setOtpValue("");
-      await fetchTransactions();
-      if (studentTx) await handleStudentSearch();
+      
+      // Attempt to refresh list without letting it crash the success experience
+      try {
+        await fetchTransactions();
+        if (studentTx) await handleStudentSearch();
+      } catch (refreshErr) {
+        console.warn("Refresh failed after success:", refreshErr);
+      }
     } catch (err) {
-      toast.error(err?.message || "رمز التأكيد غير صحيح", { id: t });
+      toast.error(err?.message || "رمز التأكيد غير صحيح أو حدث خطأ في الخادم", { id: t });
     } finally {
       setIsOtpVerifying(false);
     }

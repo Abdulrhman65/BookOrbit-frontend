@@ -75,6 +75,12 @@ const Notifications = () => {
 
   const getNotificationUI = (type) => {
     switch (String(type || "").toLowerCase()) {
+      case "good":
+        return { icon: <CheckCheck className="text-emerald-500" size={18} />, color: "emerald" };
+      case "bad":
+        return { icon: <AlertCircle className="text-rose-500" size={18} />, color: "rose" };
+      case "normal":
+        return { icon: <Bell className="text-blue-500" size={18} />, color: "blue" };
       case "borrowing":
       case "request":
         return { icon: <Repeat className="text-emerald-500" size={18} />, color: "emerald", action: "عرض الطلب" };
@@ -111,13 +117,18 @@ const Notifications = () => {
 
   const filteredNotifications = activeTab === "all" 
     ? notifications 
-    : notifications.filter(n => (n.type === activeTab || (activeTab === "unread" && !n.isRead) || (activeTab === "borrowing" && (n.type === "borrowing" || n.type === "request"))));
+    : notifications.filter(n => {
+        const type = String(n.type || "").toLowerCase();
+        if (activeTab === "unread") return !n.isRead;
+        return type === activeTab;
+      });
 
   const tabs = [
     { id: "all", label: "الكل" },
     { id: "unread", label: "غير المقروءة" },
-    { id: "borrowing", label: "الطلبات" },
-    { id: "system", label: "النظام" }
+    { id: "good", label: "جيد" },
+    { id: "normal", label: "عادي" },
+    { id: "bad", label: "سيء" }
   ];
 
   const getColorClasses = (color) => {
@@ -217,37 +228,72 @@ const Notifications = () => {
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                       onClick={() => !notification.isRead && markAsRead(notification.id)}
-                      className={`group relative p-5 rounded-3xl border transition-all cursor-pointer ${
+                      className={`group relative p-5 rounded-3xl border transition-all cursor-pointer overflow-hidden ${
                         notification.isRead 
-                          ? "bg-white/60 dark:bg-white/[0.03] border-library-primary/5 dark:border-white/5" 
-                          : "bg-white dark:bg-white/[0.07] border-library-accent/20 shadow-sm"
+                          ? {
+                              emerald: "bg-emerald-50/30 border-emerald-100/50 dark:bg-emerald-500/5 dark:border-emerald-500/10",
+                              blue: "bg-blue-50/30 border-blue-100/50 dark:bg-blue-500/5 dark:border-blue-500/10",
+                              rose: "bg-rose-50/30 border-rose-100/50 dark:bg-rose-500/5 dark:border-rose-500/10",
+                              amber: "bg-amber-50/30 border-amber-100/50 dark:bg-amber-500/5 dark:border-amber-500/10",
+                              indigo: "bg-indigo-50/30 border-indigo-100/50 dark:bg-indigo-500/5 dark:border-indigo-500/10",
+                            }[ui.color] || "bg-white/60 dark:bg-white/[0.03] border-library-primary/5"
+                          : {
+                              emerald: "bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 shadow-lg shadow-emerald-500/5",
+                              blue: "bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/30 shadow-lg shadow-blue-500/5",
+                              rose: "bg-rose-50 border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 shadow-lg shadow-rose-500/5",
+                              amber: "bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30 shadow-lg shadow-amber-500/5",
+                              indigo: "bg-indigo-50 border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/30 shadow-lg shadow-indigo-500/5",
+                            }[ui.color] || "bg-white dark:bg-white/[0.07] border-library-accent/20 shadow-sm"
                       }`}
                     >
+                      {/* Decorative gradient background */}
                       {!notification.isRead && (
-                        <div className="absolute top-6 right-6 w-2 h-2 rounded-full bg-library-accent"></div>
+                        <div className={`absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-20 pointer-events-none -mr-16 -mt-16 bg-current ${
+                          ui.color === 'emerald' ? 'text-emerald-500' :
+                          ui.color === 'blue' ? 'text-blue-500' :
+                          ui.color === 'rose' ? 'text-rose-500' :
+                          ui.color === 'amber' ? 'text-amber-500' : 'text-indigo-500'
+                        }`}></div>
                       )}
 
-                      <div className="flex gap-4">
-                        <div className={`w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center border ${getColorClasses(ui.color)}`}>
+                      {!notification.isRead && (
+                        <div className={`absolute top-6 right-6 w-2 h-2 rounded-full ${
+                          ui.color === 'emerald' ? 'bg-emerald-500' :
+                          ui.color === 'blue' ? 'bg-blue-500' :
+                          ui.color === 'rose' ? 'bg-rose-500' :
+                          ui.color === 'amber' ? 'bg-amber-500' : 'bg-indigo-500'
+                        }`}></div>
+                      )}
+
+                      <div className="flex gap-4 relative z-10">
+                        <div className={`w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center border shadow-sm ${getColorClasses(ui.color)}`}>
                           {ui.icon}
                         </div>
 
                         <div className="flex-grow min-w-0 pr-2">
                           <div className="flex justify-between items-start mb-1">
-                            <h3 className="text-sm font-black text-library-primary dark:text-white truncate pr-4">
+                            <h3 className={`text-sm font-black truncate pr-4 ${
+                              notification.isRead ? "text-library-primary/70 dark:text-gray-300" : "text-library-primary dark:text-white"
+                            }`}>
                               {notification.title}
                             </h3>
                             <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 whitespace-nowrap">
                               {formatTime(notification.createdAt)}
                             </span>
                           </div>
-                          <p className="text-[13px] font-medium text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                          <p className={`text-[13px] font-medium leading-relaxed mb-4 ${
+                            notification.isRead ? "text-gray-500 dark:text-gray-500" : "text-gray-600 dark:text-gray-400"
+                          }`}>
                             {notification.message}
                           </p>
 
                           <div className="flex items-center gap-3">
                             {ui.action && (
-                              <button className="px-4 py-2 rounded-xl bg-library-accent text-white text-[11px] font-black hover:shadow-lg hover:shadow-library-accent/20 transition-all">
+                              <button className={`px-4 py-2 rounded-xl text-[11px] font-black transition-all shadow-sm ${
+                                ui.color === 'emerald' ? 'bg-emerald-500 hover:bg-emerald-600 text-white' :
+                                ui.color === 'blue' ? 'bg-blue-500 hover:bg-blue-600 text-white' :
+                                'bg-library-accent hover:bg-library-accent/90 text-white'
+                              }`}>
                                 {ui.action}
                               </button>
                             )}

@@ -177,7 +177,7 @@ const StudentDashboard = () => {
             <DashboardCard title="الأرشيف الرقمي" desc="تصفح جميع المراجع والكتب المتاحة للاستعارة من زملائك في مختلف الكليات." icon={BookOpen} to="/dashboard" delay={0.1} />
             <DashboardCard title="الملف الشخصي" desc="قم بإدارة بياناتك الشخصية، تعديل صورتك، وتحديث معلومات التواصل." icon={User} to="/profile" delay={0.2} />
             <DashboardCard title="نسخي الخاصة" desc="أضف كتبك الخاصة للمنصة، تحكم بحالتها، واجعلها متاحة لإفادة غيرك." icon={Layers} to="/my-copies" delay={0.3} />
-            <DashboardCard title="الطلبات الواردة" desc="وافق أو ارفض طلبات الاستعارة المقدمة لك من زملائك على كتبك الخاصة." icon={Repeat} to="/lending/incoming" delay={0.4} badge="جديد" />
+            <DashboardCard title="الطلبات الواردة" desc="وافق أو ارفض طلبات الاستعارة المقدمة لك من زملائك على كتبك الخاصة." icon={Repeat} to="/lending/incoming" delay={0.4}/>
             <DashboardCard title="طلباتي الصادرة" desc="تابع حالة الكتب التي طلبت استعارتها من الآخرين وتاريخ استحقاقها." icon={Repeat} to="/lending/outgoing" delay={0.5} />
             <DashboardCard title="المعاملات الواردة" desc="تابع حالة الكتب التي أعرتها للآخرين وتأكد من استلامها عند الإرجاع." icon={ArrowDown} to="/lending/transactions/in" delay={0.6} />
             <DashboardCard title="المعاملات الصادرة" desc="تابع حالة الكتب التي استعرتها من زملائك، أكد إرجاعها أو بلّغ عن فقدانها." icon={ArrowUp} to="/lending/transactions/out" delay={0.7} />

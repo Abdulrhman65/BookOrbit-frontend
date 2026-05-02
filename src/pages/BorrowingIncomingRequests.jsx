@@ -215,12 +215,20 @@ const BorrowingIncomingRequests = () => {
     const t = toast.loading("جاري التحقق من الرمز...");
     try {
       await borrowingApi.deliver(otpTargetId, otpValue);
+      
+      // ✅ Success in API call
       toast.success("تم تسليم الكتاب بنجاح!", { id: t });
       setShowOtpModal(false);
       setOtpValue("");
-      await fetchRequests();
+      
+      // Attempt refresh safely
+      try {
+        await fetchRequests();
+      } catch (refreshErr) {
+        console.warn("Refresh failed after success:", refreshErr);
+      }
     } catch (err) {
-      showReadableAccessErrorToast(err, user, "رمز التأكيد غير صحيح", { id: t });
+      showReadableAccessErrorToast(err, user, "رمز التأكيد غير صحيح أو حدث خطأ في النظام", { id: t });
     } finally {
       setIsOtpVerifying(false);
     }

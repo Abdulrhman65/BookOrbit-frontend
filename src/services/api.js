@@ -279,6 +279,8 @@ const commonErrorTranslations = {
   "Not Found": "غير موجود",
   "User is already verified": "هذا المستخدم موثق بالفعل",
   "Invalid token": "رمز غير صالح أو منتهي الصلاحية",
+  "otp invalid": "رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى",
+  "OTP invalid": "رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى",
   "Password must have at least": "كلمة المرور يجب أن تحتوي على الأقل على حرف كبير ورقم ورمز",
   "User not found": "المستخدم غير موجود",
   "Incorrect current password": "كلمة المرور الحالية غير صحيحة",
@@ -848,7 +850,7 @@ export const borrowingApi = {
   /** POST /borrowingrequests/{id}/deliver — Complete delivery with OTP */
   deliver: (id, otp) => apiRequest(`/borrowingrequests/${id}/deliver`, { 
     method: "POST", 
-    body: JSON.stringify({ otp }) 
+    body: JSON.stringify({ otp, OTP: otp }) 
   }),
 };
 
@@ -866,7 +868,7 @@ export const borrowingTransactionsApi = {
   /** POST /borrowingtransactions/{id}/return — Complete return with OTP */
   return: (id, otp) => apiRequest(`/borrowingtransactions/${id}/return`, { 
     method: "POST", 
-    body: JSON.stringify({ otp }) 
+    body: JSON.stringify({ otp, OTP: otp }) 
   }),
 
   /** POST /borrowingtransactions/{id}/otp — Send OTP to lender for return confirmation */

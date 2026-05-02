@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, User, Building, Hash, CopyPlus, ArrowRight, Loader2, AlertCircle, CalendarDays, Coins, Repeat } from "lucide-react";
+import { BookOpen, User, Building, Hash, CopyPlus, ArrowRight, Loader2, AlertCircle, CalendarDays, Coins, Repeat, Check } from "lucide-react";
 import { booksApi, bookCopiesApi, lendingApi, borrowingApi } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/common/Navbar";
 import toast from "react-hot-toast";
 
@@ -21,10 +22,13 @@ const CONDITION_KEY_TO_LABEL = {
   worn: "قديم/مهترئ",
 };
 
-const BookCopyCard = ({ record, isProcessing, onBorrow }) => {
+const BookCopyCard = ({ record, isProcessing, onBorrow, currentStudentId }) => {
   const copy = record?.bookCopy || record?.BookCopy || record;
   const copyState = String(record?.state ?? record?.State ?? "").toLowerCase();
   
+  const ownerId = record.studentId || record.ownerId || record.OwnerId || copy?.studentId;
+  const isMyCopy = String(ownerId) === String(currentStudentId);
+
   const conditionLabel =
     BOOK_COPY_CONDITIONS[copy?.condition] ||
     BOOK_COPY_CONDITIONS[copy?.Condition] ||
@@ -32,7 +36,14 @@ const BookCopyCard = ({ record, isProcessing, onBorrow }) => {
     "غير محدد";
   
   return (
-    <div className="bg-white/60 dark:bg-white/[0.02] border border-gray-100 dark:border-white/10 rounded-2xl p-5 hover:border-library-accent/30 transition-all flex flex-col justify-between shadow-sm">
+    <div className={`relative bg-white/60 dark:bg-white/[0.02] border rounded-2xl p-5 hover:border-library-accent/30 transition-all flex flex-col justify-between shadow-sm ${
+      isMyCopy ? "border-library-accent/50 ring-2 ring-library-accent/5 bg-library-accent/[0.02]" : "border-gray-100 dark:border-white/10"
+    }`}>
+      {isMyCopy && (
+        <div className="absolute -top-3 right-4 px-3 py-1 bg-library-accent text-white text-[10px] font-black rounded-full shadow-lg z-20">
+          نسختك
+        </div>
+      )}
       <div>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-library-primary/5 dark:bg-white/5 flex items-center justify-center">
@@ -41,10 +52,10 @@ const BookCopyCard = ({ record, isProcessing, onBorrow }) => {
           <div>
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">صاحب النسخة</p>
             <Link 
-              to={`/student/${record.studentId || record.ownerId || record.OwnerId}`}
+              to={`/student/${ownerId}`}
               className="text-sm font-black text-library-primary dark:text-white hover:text-library-accent transition-colors"
             >
-              {record.studentName || record.ownerName || copy?.studentName || "زميل"}
+              {isMyCopy ? "أنت (صاحب النسخة)" : (record.studentName || record.ownerName || copy?.studentName || "زميل")}
             </Link>
           </div>
         </div>
@@ -68,11 +79,15 @@ const BookCopyCard = ({ record, isProcessing, onBorrow }) => {
       
       <button 
         onClick={() => onBorrow(record)}
-        disabled={isProcessing}
-        className="w-full py-3 rounded-xl bg-library-primary text-white font-black text-xs hover:bg-library-accent transition-all flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:hover:bg-library-primary"
+        disabled={isProcessing || isMyCopy}
+        className={`w-full py-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 ${
+          isMyCopy 
+            ? "bg-gray-100 dark:bg-white/5 text-gray-400 cursor-not-allowed" 
+            : "bg-library-primary text-white hover:bg-library-accent"
+        }`}
       >
-        {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Repeat size={16} />}
-        {"طلب استعارة هذه النسخة"}
+        {isProcessing ? <Loader2 size={16} className="animate-spin" /> : isMyCopy ? <Check size={16} /> : <Repeat size={16} />}
+        {isMyCopy ? "هذه نسختك" : "طلب استعارة هذه النسخة"}
       </button>
     </div>
   );
@@ -81,6 +96,8 @@ const BookCopyCard = ({ record, isProcessing, onBorrow }) => {
 const BookDetail = () => {
   const { bookId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const currentStudentId = user?.studentId || user?.id;
   
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -385,6 +402,7 @@ const BookDetail = () => {
                 <BookCopyCard 
                   key={recordId} 
                   record={record}
+                  currentStudentId={currentStudentId}
                   isProcessing={processingRecordId === recordId}
                   onBorrow={handleBorrowRequest} 
                 />
