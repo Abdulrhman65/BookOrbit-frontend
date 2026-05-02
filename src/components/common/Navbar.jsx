@@ -26,6 +26,7 @@ import { useTheme } from "../../context/ThemeContext";
 
 import { OrbitIcon } from "./OrbitIcon";
 import { notificationsApi } from "../../services/api";
+import { translateNotificationText } from "../../utils/translations";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -254,8 +255,15 @@ const Navbar = () => {
                                           {ui.icon}
                                         </div>
                                         <div className="min-w-0 flex-grow">
-                                          <p className={`text-[11px] truncate ${!n.isRead ? "font-black text-library-primary dark:text-white" : "font-bold text-gray-500"}`}>{n.title}</p>
-                                          <p className="text-[9px] text-gray-400 font-bold">{formatBriefTime(n.createdAt)}</p>
+                                          <p className={`text-[11px] truncate ${!n.isRead ? "font-black text-library-primary dark:text-white" : "font-bold text-gray-500"}`}>
+                                            {translateNotificationText(n.title)}
+                                          </p>
+                                          {n.message && (
+                                            <p className="text-[10px] text-gray-400 truncate opacity-70">
+                                              {translateNotificationText(n.message)}
+                                            </p>
+                                          )}
+                                          <p className="text-[9px] text-gray-400 font-bold mt-1">{formatBriefTime(n.createdAt)}</p>
                                         </div>
                                         {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-library-accent"></div>}
                                       </Link>

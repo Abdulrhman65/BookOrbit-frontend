@@ -134,19 +134,32 @@ export const LENDING_STATE_LABELS = {
 
 export const BORROWING_REQUEST_STATE_LABELS = {
   Pending: "قيد الانتظار",
-  Accepted: "تم القبول",
+  pending: "قيد الانتظار",
+  Accepted: "مقبول",
+  accepted: "مقبول",
   Rejected: "مرفوض",
+  rejected: "مرفوض",
   Cancelled: "ملغي",
+  cancelled: "ملغي",
   Expired: "منتهي",
+  expired: "منتهي",
   Delivered: "تم التسليم",
-  Returned: "تم الإرجاع",
+  delivered: "تم التسليم",
+  Borrowed: "مستعار",
+  borrowed: "مستعار",
+  Returned: "مُرجع",
+  returned: "مُرجع",
 };
 
 export const BORROWING_TRANSACTION_STATE_LABELS = {
-  Borrowed: "قيد الاستعارة (لم يُرجع بعد)",
-  Returned: "تم الإرجاع",
-  Overdue: "متأخر (تجاوز المدة)",
+  Borrowed: "مستعار",
+  borrowed: "مستعار",
+  Returned: "مُرجع",
+  returned: "مُرجع",
+  Overdue: "متأخر",
+  overdue: "متأخر",
   Lost: "مفقود",
+  lost: "مفقود",
 };
 
 export const BOOK_CATEGORY_LABELS = {

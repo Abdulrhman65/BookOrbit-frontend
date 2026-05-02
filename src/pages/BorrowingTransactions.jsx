@@ -302,7 +302,8 @@ const TransactionCard = ({
     actDate,
     displayCoverUrl,
   } = s;
-  const statusAr = getLabel(BORROWING_TRANSACTION_STATE_LABELS, statusKey);  const processing = isProcessing === id;
+  const statusAr = getLabel(BORROWING_TRANSACTION_STATE_LABELS, statusKey);
+  const processing = isProcessing === id;
 
   const openDetail =
     typeof onShowDetail === "function" ? () => onShowDetail(tx) : null;

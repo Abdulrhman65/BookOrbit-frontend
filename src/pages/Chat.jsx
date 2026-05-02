@@ -243,7 +243,7 @@ const Chat = () => {
           {activeGroup ? (
             <>
               {/* Header */}
-              <div className="p-3 md:p-4 border-b border-library-primary/5 dark:border-white/5 flex items-center justify-between bg-white/50 dark:bg-black/30 backdrop-blur-xl">
+              <div className="p-3 md:p-4 border-b border-library-primary/5 dark:border-white/5 flex items-center justify-between bg-white/50 dark:bg-black/30 backdrop-blur-xl relative z-40">
                 <div className="flex items-center gap-3">
                   <button onClick={() => setIsSidebarOpen(true)} className="md:hidden w-8 h-8 rounded-lg bg-gray-100/50 dark:bg-white/5 flex items-center justify-center text-gray-500"><ChevronRight size={18} /></button>
                   <div onClick={() => navigate(`/student/${activeGroup.otherStudentId}`)} className="flex items-center gap-3 cursor-pointer group">
@@ -252,7 +252,6 @@ const Chat = () => {
                     </div>
                     <div className="min-w-0">
                       <h2 className="text-[13px] md:text-[14px] font-black truncate">{activeGroup.otherStudentName}</h2>
-                      <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div><span className="text-[9px] md:text-[10px] text-library-accent font-black">نشط الآن</span></div>
                     </div>
                   </div>
                 </div>
