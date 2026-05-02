@@ -97,6 +97,54 @@ const Notifications = () => {
     }
   };
 
+  const notificationTranslations = {
+    // الأنماط المعقدة (Complex Patterns - should be first)
+    "Your request for the book": "طلبك لكتاب",
+    "for the book": "للكتاب",
+    "for your copy of the book": "لنسختك من كتاب",
+    "A student has requested your copy of the book": "طلب أحد الطلاب استعارة نسختك من كتاب",
+    "You have been rated": "لقد حصلت على تقييم",
+    "stars": "نجوم",
+    "star": "نجمة",
+    "You have earned": "لقد ربحت",
+    "points": "نقاط",
+    "point": "نقطة",
+    "Your": "طلبك الـ",
+
+    // العناوين (Titles)
+    "Borrowing Request": "طلب استعارة",
+    "Request Accepted": "تم قبول الطلب",
+    "Request Rejected": "تم رفض الطلب",
+    "Request Cancelled": "تم إلغاء الطلب",
+    "Book Delivered": "تم تسليم الكتاب",
+    "Book Returned": "تم إرجاع الكتاب",
+    "New Review": "تقييم جديد",
+    "Points Received": "نقاط مكتسبة",
+    "System Update": "تحديث النظام",
+    "Reminder": "تذكير",
+
+    // الجمل الشائعة (Messages)
+    "has been accepted": "تم قبوله",
+    "has been rejected": "تم رفضه",
+    "wants to borrow": "يريد استعارة",
+    "has returned the book": "قام بإرجاع الكتاب",
+    "has delivered the book": "قام بتسليم الكتاب",
+    "Successfully": "بنجاح",
+    "Your request for": "طلبك لـ",
+    "New borrowing request from": "طلب استعارة جديد من",
+    "You received": "لقد استلمت",
+  };
+
+  const translateText = (text) => {
+    if (!text) return text;
+    let translated = text;
+    Object.entries(notificationTranslations).forEach(([en, ar]) => {
+      const regex = new RegExp(en, "gi");
+      translated = translated.replace(regex, ar);
+    });
+    return translated;
+  };
+
   const formatTime = (dateStr) => {
     if (!dateStr) return "";
     try {
@@ -275,7 +323,7 @@ const Notifications = () => {
                             <h3 className={`text-sm font-black truncate pr-4 ${
                               notification.isRead ? "text-library-primary/70 dark:text-gray-300" : "text-library-primary dark:text-white"
                             }`}>
-                              {notification.title}
+                              {translateText(notification.title)}
                             </h3>
                             <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 whitespace-nowrap">
                               {formatTime(notification.createdAt)}
@@ -284,7 +332,7 @@ const Notifications = () => {
                           <p className={`text-[13px] font-medium leading-relaxed mb-4 ${
                             notification.isRead ? "text-gray-500 dark:text-gray-500" : "text-gray-600 dark:text-gray-400"
                           }`}>
-                            {notification.message}
+                            {translateText(notification.message)}
                           </p>
 
                           <div className="flex items-center gap-3">
