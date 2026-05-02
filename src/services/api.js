@@ -925,8 +925,7 @@ export const notificationsApi = {
     const query = buildQuery({
       Page: 1,
       PageSize: 15,
-      SortDirection: "asc",
-      Types: "normal",
+      SortDirection: "desc",
       ...params
     });
     const res = await apiRequest(`/notifications?${query}`);
@@ -944,9 +943,21 @@ export const notificationsApi = {
   markAsRead: (notificationId) =>
     apiRequest(`/notifications/${notificationId}/read`, { method: "PATCH", body: JSON.stringify({}) }),
 
-  /** PATCH /notifications/read-all (Assuming standard endpoint) */
-  markAllAsRead: () =>
-    apiRequest(`/notifications/read-all`, { method: "PATCH", body: JSON.stringify({}) }),
+  /** PATCH /notifications/read?maxTime={maxTime} */
+  markAllAsRead: (maxTime) => {
+    const time = maxTime || new Date(Date.now() + 10000).toISOString().replace('Z', '0000+00:00');
+    return apiRequest(`/notifications/read`, { 
+      method: "PATCH", 
+      params: { 
+        maxTime: time,
+        MaxTime: time 
+      },
+      body: JSON.stringify({ 
+        maxTime: time,
+        MaxTime: time 
+      })
+    });
+  },
 
   /** DELETE /notifications/{notificationId} (Assuming standard endpoint) */
   delete: (notificationId) =>

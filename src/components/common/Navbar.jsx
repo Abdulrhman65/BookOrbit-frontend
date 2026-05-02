@@ -36,19 +36,25 @@ const Navbar = () => {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [notifications, setNotifications] = useState([]);
 
+  const fetchBrief = async () => {
+    try {
+      const res = await notificationsApi.getAll({ PageSize: 5 });
+      setNotifications(res.items);
+    } catch (err) {
+      console.error("Error fetching brief notifications:", err);
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn && user?.role?.toLowerCase() !== "admin") {
-      const fetchBrief = async () => {
-        try {
-          const res = await notificationsApi.getAll({ PageSize: 5 });
-          setNotifications(res.items);
-        } catch (err) {
-          console.error("Error fetching brief notifications:", err);
-        }
-      };
       fetchBrief();
     }
   }, [isLoggedIn, user]);
+
+  useEffect(() => {
+    window.addEventListener("notifications:updated", fetchBrief);
+    return () => window.removeEventListener("notifications:updated", fetchBrief);
+  }, []);
 
   // Try to find the best display name
   const displayName =
@@ -182,7 +188,8 @@ const Navbar = () => {
                         title="الرسائل"
                       >
                         <MessageSquare size={17} />
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-library-accent rounded-full border-2 border-white dark:border-dark-bg animate-bounce"></span>
+                        {/* Only show if there are unread messages - assuming logic exists or hardcoded for now */}
+                        {/* <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-library-accent rounded-full border-2 border-white dark:border-dark-bg animate-bounce"></span> */}
                       </Link>
 
                       <div 
@@ -196,7 +203,9 @@ const Navbar = () => {
                           title="الإشعارات"
                         >
                           <Bell size={17} />
-                          <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-dark-bg animate-pulse"></span>
+                          {notifications.some(n => !n.isRead) && (
+                            <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-dark-bg animate-pulse"></span>
+                          )}
                         </Link>
 
                         <AnimatePresence>

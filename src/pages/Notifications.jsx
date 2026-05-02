@@ -41,8 +41,13 @@ const Notifications = () => {
 
   const markAllAsRead = async () => {
     try {
+      // Optimistically update local state
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      
       await notificationsApi.markAllAsRead();
-      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+      
+      // Notify other components (like Navbar) to refresh
+      window.dispatchEvent(new CustomEvent("notifications:updated"));
     } catch (err) {
       console.error("Error marking all as read:", err);
     }
@@ -52,6 +57,7 @@ const Notifications = () => {
     try {
       await notificationsApi.delete(id);
       setNotifications(notifications.filter(n => n.id !== id));
+      window.dispatchEvent(new CustomEvent("notifications:updated"));
     } catch (err) {
       console.error("Error deleting notification:", err);
     }
@@ -61,6 +67,7 @@ const Notifications = () => {
     try {
       await notificationsApi.markAsRead(id);
       setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true } : n));
+      window.dispatchEvent(new CustomEvent("notifications:updated"));
     } catch (err) {
       console.error("Error marking notification as read:", err);
     }
