@@ -32,6 +32,7 @@ import Aurora from './components/effects/Aurora';
 // Contexts
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import ChatProvider from './context/ChatContext';
 
 // ── Guards ───────────────────────────────────────────────────────────────────
 const ProtectedRoute = ({ children }) => {
@@ -146,7 +147,9 @@ function App() {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <AppRoutes />
+          <ChatProvider>
+            <AppRoutes />
+          </ChatProvider>
         </AuthProvider>
       </ThemeProvider>
     </Router>

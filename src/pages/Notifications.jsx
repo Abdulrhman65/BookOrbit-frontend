@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bell, 
@@ -16,75 +16,95 @@ import {
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
+import { notificationsApi } from "../services/api";
 
 const Notifications = () => {
   const [activeTab, setActiveTab] = useState("all");
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "borrowing",
-      title: "طلب استعارة جديد",
-      message: "طلب 'أحمد علي' استعارة نسخة من كتاب 'فن اللامبالاة' الخاص بك.",
-      time: "منذ 5 دقائق",
-      isRead: false,
-      icon: <Repeat className="text-emerald-500" size={18} />,
-      color: "emerald",
-      action: "عرض الطلب"
-    },
-    {
-      id: 2,
-      type: "system",
-      title: "تم توثيق حسابك",
-      message: "تهانينا! لقد تمت مراجعة حسابك وتوثيقه بنجاح. يمكنك الآن عرض كتبك للإعارة.",
-      time: "منذ ساعتين",
-      isRead: true,
-      icon: <ShieldCheck className="text-blue-500" size={18} />,
-      color: "blue"
-    },
-    {
-      id: 3,
-      type: "points",
-      title: "زيادة في النقاط",
-      message: "حصلت على 50 نقطة مكافأة لإتمامك أول عملية إعارة بنجاح.",
-      time: "منذ 5 ساعات",
-      isRead: false,
-      icon: <Coins className="text-amber-500" size={18} />,
-      color: "amber"
-    },
-    {
-      id: 4,
-      type: "reminder",
-      title: "تذكير بموعد الإرجاع",
-      message: "يجب إرجاع كتاب 'قواعد العشق الأربعون' غداً لتجنب خصم النقاط.",
-      time: "منذ يوم واحد",
-      isRead: true,
-      icon: <Clock className="text-rose-500" size={18} />,
-      color: "rose",
-      action: "تواصل مع المالك"
-    },
-    {
-      id: 5,
-      type: "system",
-      title: "كتاب جديد متاح",
-      message: "أضاف 'عمر خالد' نسخة جديدة من 'رواية 1984' التي كنت تبحث عنها.",
-      time: "منذ يومين",
-      isRead: true,
-      icon: <BookOpen className="text-indigo-500" size={18} />,
-      color: "indigo"
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await notificationsApi.getAll();
+      setNotifications(res.items);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  const markAllAsRead = async () => {
+    try {
+      await notificationsApi.markAllAsRead();
+      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+    } catch (err) {
+      console.error("Error marking all as read:", err);
+    }
+  };
+
+  const deleteNotification = async (id) => {
+    try {
+      await notificationsApi.delete(id);
+      setNotifications(notifications.filter(n => n.id !== id));
+    } catch (err) {
+      console.error("Error deleting notification:", err);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await notificationsApi.markAsRead(id);
+      setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true } : n));
+    } catch (err) {
+      console.error("Error marking notification as read:", err);
+    }
+  };
+
+  const getNotificationUI = (type) => {
+    switch (String(type || "").toLowerCase()) {
+      case "borrowing":
+      case "request":
+        return { icon: <Repeat className="text-emerald-500" size={18} />, color: "emerald", action: "عرض الطلب" };
+      case "system":
+        return { icon: <ShieldCheck className="text-blue-500" size={18} />, color: "blue" };
+      case "points":
+        return { icon: <Coins className="text-amber-500" size={18} />, color: "amber" };
+      case "reminder":
+        return { icon: <Clock className="text-rose-500" size={18} />, color: "rose" };
+      case "book":
+        return { icon: <BookOpen className="text-indigo-500" size={18} />, color: "indigo" };
+      default:
+        return { icon: <Bell className="text-blue-500" size={18} />, color: "blue" };
+    }
+  };
+
+  const formatTime = (dateStr) => {
+    if (!dateStr) return "";
+    try {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+
+      if (diffInSeconds < 60) return "الآن";
+      if (diffInSeconds < 3600) return `منذ ${Math.floor(diffInSeconds / 60)} دقيقة`;
+      if (diffInSeconds < 86400) return `منذ ${Math.floor(diffInSeconds / 3600)} ساعة`;
+      if (diffInSeconds < 604800) return `منذ ${Math.floor(diffInSeconds / 86400)} يوم`;
+      
+      return date.toLocaleDateString("ar-EG");
+    } catch {
+      return dateStr;
+    }
+  };
 
   const filteredNotifications = activeTab === "all" 
     ? notifications 
-    : notifications.filter(n => n.type === activeTab || (activeTab === "unread" && !n.isRead));
-
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, isRead: true })));
-  };
-
-  const deleteNotification = (id) => {
-    setNotifications(notifications.filter(n => n.id !== id));
-  };
+    : notifications.filter(n => (n.type === activeTab || (activeTab === "unread" && !n.isRead) || (activeTab === "borrowing" && (n.type === "borrowing" || n.type === "request"))));
 
   const tabs = [
     { id: "all", label: "الكل" },
@@ -173,61 +193,73 @@ const Notifications = () => {
           {/* Notifications List */}
           <div className="space-y-4">
             <AnimatePresence mode="popLayout">
-              {filteredNotifications.length > 0 ? (
-                filteredNotifications.map((notification, index) => (
-                  <motion.div
-                    key={notification.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className={`group relative p-5 rounded-3xl border transition-all ${
-                      notification.isRead 
-                        ? "bg-white/60 dark:bg-white/[0.03] border-library-primary/5 dark:border-white/5" 
-                        : "bg-white dark:bg-white/[0.07] border-library-accent/20 shadow-sm"
-                    }`}
-                  >
-                    {!notification.isRead && (
-                      <div className="absolute top-6 right-6 w-2 h-2 rounded-full bg-library-accent"></div>
-                    )}
+              {loading ? (
+                <div className="py-20 text-center">
+                  <div className="w-10 h-10 border-4 border-library-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-sm font-bold text-gray-500">جاري تحميل الإشعارات...</p>
+                </div>
+              ) : filteredNotifications.length > 0 ? (
+                filteredNotifications.map((notification, index) => {
+                  const ui = getNotificationUI(notification.type);
+                  return (
+                    <motion.div
+                      key={notification.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                      onClick={() => !notification.isRead && markAsRead(notification.id)}
+                      className={`group relative p-5 rounded-3xl border transition-all cursor-pointer ${
+                        notification.isRead 
+                          ? "bg-white/60 dark:bg-white/[0.03] border-library-primary/5 dark:border-white/5" 
+                          : "bg-white dark:bg-white/[0.07] border-library-accent/20 shadow-sm"
+                      }`}
+                    >
+                      {!notification.isRead && (
+                        <div className="absolute top-6 right-6 w-2 h-2 rounded-full bg-library-accent"></div>
+                      )}
 
-                    <div className="flex gap-4">
-                      <div className={`w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center border ${getColorClasses(notification.color)}`}>
-                        {notification.icon}
-                      </div>
-
-                      <div className="flex-grow min-w-0 pr-2">
-                        <div className="flex justify-between items-start mb-1">
-                          <h3 className="text-sm font-black text-library-primary dark:text-white truncate pr-4">
-                            {notification.title}
-                          </h3>
-                          <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 whitespace-nowrap">
-                            {notification.time}
-                          </span>
+                      <div className="flex gap-4">
+                        <div className={`w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center border ${getColorClasses(ui.color)}`}>
+                          {ui.icon}
                         </div>
-                        <p className="text-[13px] font-medium text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
-                          {notification.message}
-                        </p>
 
-                        <div className="flex items-center gap-3">
-                          {notification.action && (
-                            <button className="px-4 py-2 rounded-xl bg-library-accent text-white text-[11px] font-black hover:shadow-lg hover:shadow-library-accent/20 transition-all">
-                              {notification.action}
+                        <div className="flex-grow min-w-0 pr-2">
+                          <div className="flex justify-between items-start mb-1">
+                            <h3 className="text-sm font-black text-library-primary dark:text-white truncate pr-4">
+                              {notification.title}
+                            </h3>
+                            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                              {formatTime(notification.createdAt)}
+                            </span>
+                          </div>
+                          <p className="text-[13px] font-medium text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                            {notification.message}
+                          </p>
+
+                          <div className="flex items-center gap-3">
+                            {ui.action && (
+                              <button className="px-4 py-2 rounded-xl bg-library-accent text-white text-[11px] font-black hover:shadow-lg hover:shadow-library-accent/20 transition-all">
+                                {ui.action}
+                              </button>
+                            )}
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteNotification(notification.id);
+                              }}
+                              className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all md:opacity-0 group-hover:opacity-100"
+                              title="حذف"
+                            >
+                              <Trash2 size={16} />
                             </button>
-                          )}
-                          <button 
-                            onClick={() => deleteNotification(notification.id)}
-                            className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all md:opacity-0 group-hover:opacity-100"
-                            title="حذف"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))
+                    </motion.div>
+                  );
+                })
               ) : (
                 <motion.div 
                   initial={{ opacity: 0 }}

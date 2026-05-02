@@ -1,5 +1,5 @@
 // ─── BookOrbit API Configuration ────────────────────────────────────────────
-import { API_BASE_URL, API_V1, tokenStore, BOOK_CATEGORY_LABELS, getBookImageUrl, getLabel, BORROWING_REQUEST_STATE_LABELS } from "../utils/constants";
+import { API_BASE_URL, API_V1, tokenStore, BOOK_CATEGORY_LABELS, getBookImageUrl, getStudentImageUrl, getLabel, BORROWING_REQUEST_STATE_LABELS } from "../utils/constants";
 
 // ─── Token Refresh Queue ─────────────────────────────────────────────────────
 let isRefreshing = false;
@@ -205,6 +205,50 @@ const normalizeBorrowingRequest = (request = {}) => {
     isOverdue: Boolean(request.isOverdue),
     status: stateLabel,
     state: stateValue ?? mappedState,
+  };
+};
+
+export const normalizeNotification = (n = {}) => ({
+  id: n.id || n.Id,
+  type: n.type || n.Type || "system",
+  title: n.title || n.Title || "إشعار جديد",
+  message: n.message || n.Message || n.body || n.Body || "",
+  createdAt: n.createdAtUtc || n.CreatedAtUtc || n.createdAt || n.CreatedAt || new Date().toISOString(),
+  isRead: n.isRead ?? n.IsRead ?? false,
+  notificationId: n.notificationId || n.NotificationId || n.id || n.Id,
+  metadata: n.metadata || n.Metadata || {},
+});
+
+export const normalizeChatMessage = (m = {}) => {
+  const dateStr = m.createdAtUtc || m.CreatedAtUtc || m.createdAt || m.CreatedAt;
+  let validDate = new Date().toISOString();
+
+  if (dateStr) {
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      validDate = parsed.toISOString();
+    }
+  }
+  
+  return {
+    id: m.id || m.Id,
+    content: m.content || m.Content || "",
+    senderId: m.senderId || m.SenderId,
+    chatGroupId: m.chatGroupId || m.ChatGroupId,
+    isRead: m.isRead ?? m.IsRead ?? false,
+    createdAt: validDate,
+  };
+};
+
+export const normalizeChatGroup = (g = {}) => {
+  const otherId = g.otherStudentId || g.OtherStudentId;
+  return {
+    chatGroupId: g.chatGroupId || g.ChatGroupId,
+    otherStudentId: otherId,
+    otherStudentName: g.otherStudentName || g.OtherStudentName || "طالب",
+    // Always use student ID based image URL like in Profile page
+    otherStudentImage: otherId ? getStudentImageUrl(otherId) : null,
+    createdAt: g.createdAtUtc || g.CreatedAtUtc || g.createdAt || g.CreatedAt || new Date().toISOString(),
   };
 };
 
@@ -786,19 +830,20 @@ export const borrowingApi = {
   create: (lendingListRecordId) =>
     apiRequest(`/lendinglist/${lendingListRecordId}/request`, {
       method: "POST",
+      body: JSON.stringify({}),
     }),
 
   /** PATCH /borrowingrequests/{id}/accept */
-  accept: (id) => apiRequest(`/borrowingrequests/${id}/accept`, { method: "PATCH" }),
+  accept: (id) => apiRequest(`/borrowingrequests/${id}/accept`, { method: "PATCH", body: JSON.stringify({}) }),
 
   /** PATCH /borrowingrequests/{id}/reject */
-  reject: (id) => apiRequest(`/borrowingrequests/${id}/reject`, { method: "PATCH" }),
+  reject: (id) => apiRequest(`/borrowingrequests/${id}/reject`, { method: "PATCH", body: JSON.stringify({}) }),
 
   /** PATCH /borrowingrequests/{id}/cancel */
-  cancel: (id) => apiRequest(`/borrowingrequests/${id}/cancel`, { method: "PATCH" }),
+  cancel: (id) => apiRequest(`/borrowingrequests/${id}/cancel`, { method: "PATCH", body: JSON.stringify({}) }),
 
   /** POST /borrowingrequests/{id}/deliver */
-  deliver: (id) => apiRequest(`/borrowingrequests/${id}/deliver`, { method: "POST" }),
+  deliver: (id) => apiRequest(`/borrowingrequests/${id}/deliver`, { method: "POST", body: JSON.stringify({}) }),
 };
 
 // ─── 7. BORROWING TRANSACTIONS ───────────────────────────────────────────────
@@ -859,4 +904,80 @@ export const reviewsApi = {
   /** GET /api/v1/borrowingreviews?ReviewedStudentId={studentId} */
   getByStudentId: (studentId) =>
     apiRequest(`/borrowingreviews`, { params: { ReviewedStudentId: studentId } }),
+};
+
+// ─── 10. NOTIFICATIONS ───────────────────────────────────────────────────────
+export const notificationsApi = {
+  /** GET /notifications */
+  getAll: async (params = {}) => {
+    const query = buildQuery({
+      Page: 1,
+      PageSize: 15,
+      SortDirection: "asc",
+      Types: "normal",
+      ...params
+    });
+    const res = await apiRequest(`/notifications?${query}`);
+    const items = Array.isArray(res?.items) ? res.items.map(normalizeNotification) : [];
+    return { ...res, items, data: items };
+  },
+
+  /** GET /notifications/{notificationId} */
+  getById: async (notificationId) => {
+    const res = await apiRequest(`/notifications/${notificationId}`);
+    return normalizeNotification(res);
+  },
+
+  /** PATCH /notifications/{notificationId}/read (Assuming standard endpoint) */
+  markAsRead: (notificationId) =>
+    apiRequest(`/notifications/${notificationId}/read`, { method: "PATCH", body: JSON.stringify({}) }),
+
+  /** PATCH /notifications/read-all (Assuming standard endpoint) */
+  markAllAsRead: () =>
+    apiRequest(`/notifications/read-all`, { method: "PATCH", body: JSON.stringify({}) }),
+
+  /** DELETE /notifications/{notificationId} (Assuming standard endpoint) */
+  delete: (notificationId) =>
+    apiRequest(`/notifications/${notificationId}`, { method: "DELETE" }),
+};
+
+// ─── 11. CHAT ────────────────────────────────────────────────────────────────
+export const chatApi = {
+  /** GET /chat/groups — List of chat groups */
+  getGroups: async (params = {}) => {
+    const query = buildQuery({
+      Page: 1,
+      PageSize: 10,
+      ...params
+    });
+    const res = await apiRequest(`/chat/groups?${query}`);
+    const items = Array.isArray(res?.items) ? res.items.map(normalizeChatGroup) : [];
+    return { ...res, items, data: items };
+  },
+
+  /** GET /chat/groups/{chatGroupId}/messages — Message history */
+  getMessages: async (chatGroupId, params = {}) => {
+    const query = buildQuery({
+      Page: 1,
+      PageSize: 10,
+      ...params
+    });
+    const res = await apiRequest(`/chat/groups/${chatGroupId}/messages?${query}`);
+    const items = Array.isArray(res?.items) ? res.items.map(normalizeChatMessage) : [];
+    return { ...res, items, data: items };
+  },
+
+  /** POST /chat/messages — Send message */
+  sendMessage: (receiverId, content) =>
+    apiRequest("/chat/messages", {
+      method: "POST",
+      body: JSON.stringify({ receiverId, content }),
+    }),
+
+  /** PATCH /chat/groups/{chatGroupId}/read — Mark all as read */
+  markAsRead: (chatGroupId) =>
+    apiRequest(`/chat/groups/${chatGroupId}/read`, {
+      method: "PATCH",
+      body: JSON.stringify({}),
+    }),
 };

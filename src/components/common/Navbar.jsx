@@ -18,12 +18,14 @@ import {
   RefreshCcw,
   Repeat,
   Coins,
+  Clock,
   MessageSquare
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 
 import { OrbitIcon } from "./OrbitIcon";
+import { notificationsApi } from "../../services/api";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -32,6 +34,21 @@ const Navbar = () => {
   const location = useLocation();
   const { isLoggedIn, user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    if (isLoggedIn && user?.role?.toLowerCase() !== "admin") {
+      const fetchBrief = async () => {
+        try {
+          const res = await notificationsApi.getAll({ PageSize: 5 });
+          setNotifications(res.items);
+        } catch (err) {
+          console.error("Error fetching brief notifications:", err);
+        }
+      };
+      fetchBrief();
+    }
+  }, [isLoggedIn, user]);
 
   // Try to find the best display name
   const displayName =
@@ -196,26 +213,48 @@ const Navbar = () => {
                                 <Link to="/notifications" className="text-[10px] font-black text-library-accent hover:underline">عرض الكل</Link>
                               </div>
                               <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
-                                {[
-                                  { id: 1, title: "طلب استعارة جديد", time: "5د", icon: <Repeat size={14} className="text-emerald-500" />, isRead: false },
-                                  { id: 2, title: "تم توثيق حسابك بنجاح", time: "2س", icon: <Shield size={14} className="text-blue-500" />, isRead: true },
-                                  { id: 3, title: "حصلت على نقاط مكافأة", time: "5س", icon: <Coins size={14} className="text-amber-500" />, isRead: false },
-                                ].map((n) => (
-                                  <Link 
-                                    key={n.id} 
-                                    to="/notifications" 
-                                    className={`flex items-center gap-3 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-library-primary/[0.02] dark:border-white/[0.02] last:border-0 ${!n.isRead ? "bg-library-accent/[0.02] dark:bg-library-accent/[0.05]" : ""}`}
-                                  >
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${!n.isRead ? "bg-library-accent/10" : "bg-gray-100 dark:bg-white/5"}`}>
-                                      {n.icon}
-                                    </div>
-                                    <div className="min-w-0 flex-grow">
-                                      <p className={`text-[11px] truncate ${!n.isRead ? "font-black text-library-primary dark:text-white" : "font-bold text-gray-500"}`}>{n.title}</p>
-                                      <p className="text-[9px] text-gray-400 font-bold">{n.time}</p>
-                                    </div>
-                                    {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-library-accent"></div>}
-                                  </Link>
-                                ))}
+                                {notifications.length > 0 ? (
+                                  notifications.map((n) => {
+                                    const ui = {
+                                      borrowing: { icon: <Repeat size={14} className="text-emerald-500" />, color: "emerald" },
+                                      request: { icon: <Repeat size={14} className="text-emerald-500" />, color: "emerald" },
+                                      system: { icon: <Shield size={14} className="text-blue-500" />, color: "blue" },
+                                      points: { icon: <Coins size={14} className="text-amber-500" />, color: "amber" },
+                                      reminder: { icon: <Clock size={14} className="text-rose-500" />, color: "rose" },
+                                      book: { icon: <BookOpen size={14} className="text-indigo-500" />, color: "indigo" },
+                                    }[String(n.type || "").toLowerCase()] || { icon: <Bell size={14} className="text-blue-500" />, color: "blue" };
+
+                                    const formatBriefTime = (dateStr) => {
+                                      if (!dateStr) return "";
+                                      const date = new Date(dateStr);
+                                      const now = new Date();
+                                      const diffInMin = Math.floor((now - date) / 60000);
+                                      if (diffInMin < 60) return `${diffInMin}د`;
+                                      const diffInHours = Math.floor(diffInMin / 60);
+                                      if (diffInHours < 24) return `${diffInHours}س`;
+                                      return `${Math.floor(diffInHours / 24)}ي`;
+                                    };
+
+                                    return (
+                                      <Link 
+                                        key={n.id} 
+                                        to="/notifications" 
+                                        className={`flex items-center gap-3 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-library-primary/[0.02] dark:border-white/[0.02] last:border-0 ${!n.isRead ? "bg-library-accent/[0.02] dark:bg-library-accent/[0.05]" : ""}`}
+                                      >
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${!n.isRead ? "bg-library-accent/10" : "bg-gray-100 dark:bg-white/5"}`}>
+                                          {ui.icon}
+                                        </div>
+                                        <div className="min-w-0 flex-grow">
+                                          <p className={`text-[11px] truncate ${!n.isRead ? "font-black text-library-primary dark:text-white" : "font-bold text-gray-500"}`}>{n.title}</p>
+                                          <p className="text-[9px] text-gray-400 font-bold">{formatBriefTime(n.createdAt)}</p>
+                                        </div>
+                                        {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-library-accent"></div>}
+                                      </Link>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="p-8 text-center text-[10px] font-bold text-gray-400">لا توجد إشعارات</div>
+                                )}
                               </div>
                               <Link 
                                 to="/notifications" 
