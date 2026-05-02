@@ -865,9 +865,8 @@ export const borrowingTransactionsApi = {
   /** GET /borrowingtransactions/{id} */
   getById: (id) => apiRequest(`/borrowingtransactions/${id}`),
 
-  /** POST /borrowingtransactions/{id}/return — Complete return with OTP */
   return: (id, otp) => apiRequest(`/borrowingtransactions/${id}/return`, { 
-    method: "POST", 
+    method: "PATCH", 
     body: JSON.stringify({ otp, OTP: otp }) 
   }),
 
