@@ -101,6 +101,7 @@ const BorrowingOutgoingRequests = () => {
   const [detailRequest, setDetailRequest] = useState(null);
   const [loadingDetailId, setLoadingDetailId] = useState(null);
   const [lendingRecordDetails, setLendingRecordDetails] = useState({});
+  const [studentNames, setStudentNames] = useState({});
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 350);
@@ -154,6 +155,31 @@ const BorrowingOutgoingRequests = () => {
   useEffect(() => {
     if (user && !isAdmin) fetchRequests();
   }, [fetchRequests, user, isAdmin]);
+
+  // Fetch missing lender names
+  useEffect(() => {
+    const fetchMissingNames = async () => {
+      const missingIds = items
+        .map(item => item.lenderId)
+        .filter(id => id && !studentNames[id] && !items.find(i => i.lenderId === id && i.lenderName));
+      
+      const uniqueIds = [...new Set(missingIds)];
+      
+      uniqueIds.forEach(async (id) => {
+        try {
+          const { studentsApi } = await import('../services/api');
+          const data = await studentsApi.getById(id);
+          if (data?.fullName) {
+            setStudentNames(prev => ({ ...prev, [id]: data.fullName }));
+          }
+        } catch (err) {
+          // ignore
+        }
+      });
+    };
+
+    if (items.length > 0) fetchMissingNames();
+  }, [items]);
 
   const handleCancel = async (id) => {
     if (!window.confirm("هل أنت متأكد من إلغاء هذا الطلب؟ سيتم استرجاع نقاطك.")) return;
@@ -321,13 +347,9 @@ const BorrowingOutgoingRequests = () => {
                   const title = req.bookTitle || req.BookTitle || "كتاب";
                   
                   // For outgoing requests, the related user is the Lender (owner)
-                  // So we use lendingStudentName, or fallback to the student name field if it's the only one.
-                  // Wait, looking at frontend-api-reference.md: BorrowingRequestListItemDto doesn't have a specific `lendingStudentName`. 
-                  // Let's check `api.js` normalizeBorrowingRequest... it maps `studentName` to `BorrowingStudentName`. 
-                  // This means `normalizeBorrowingRequest` currently maps the related name into `studentName`.
-                  // For me/out, the name in `studentName` might still be the borrower, or it might not be populated with lender.
-                  // Let's assume `req.studentName` or `req.lendingStudentName` or "زميلك"
-                  const ownerName = req.lenderName || req.ownerFullName || req.lenderFullName || "صاحب النسخة";
+                  // For outgoing requests, the lenderId is correctly mapped in normalizeBorrowingRequest
+                  const lenderId = req.lenderId;
+                  const ownerName = req.lenderName || studentNames[lenderId] || "صاحب النسخة";
                   
                   const reqDate = req.requestDate || req.createdAt || req.createdAtUtc;
                   const expDate = req.expectedReturnDate || req.returnDate || req.expirationDate;
@@ -352,7 +374,7 @@ const BorrowingOutgoingRequests = () => {
                         <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-2">
                           <div className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200/80 bg-white/80 px-2 py-1 dark:border-white/10 dark:bg-white/[0.03]">
                             <User size={12} className="text-library-accent" />
-                            <span>صاحب النسخة: <Link to={`/student/${req.lenderId}`} className="text-library-primary dark:text-white font-black hover:text-library-accent transition-colors">{ownerName}</Link></span>
+                            <span>صاحب النسخة: <Link to={`/student/${lenderId}`} className="text-library-primary dark:text-white font-black hover:text-library-accent transition-colors">{ownerName}</Link></span>
                           </div>
                           {rid ? <span className="font-mono text-[10px] opacity-70">رقم العرض: #{rid}</span> : null}
                         </div>
@@ -387,7 +409,7 @@ const BorrowingOutgoingRequests = () => {
 
                         <button
                           type="button"
-                          onClick={() => navigate(`/chat/${req.lenderId}`, { 
+                          onClick={() => navigate(`/chat/${lenderId}`, { 
                             state: { 
                               studentName: ownerName,
                               studentImage: null 

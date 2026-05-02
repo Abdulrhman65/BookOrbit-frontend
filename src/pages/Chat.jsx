@@ -111,6 +111,16 @@ const Chat = () => {
   const activeGroup = activeChatGroupId ? groups.find(g => g.chatGroupId === activeChatGroupId) : newChatStudent;
   const currentMessages = activeChatGroupId ? (messages[activeChatGroupId] || []) : [];
 
+  const allGroups = [...groups];
+  if (newChatStudent && !groups.some(g => g.otherStudentId === newChatStudent.otherStudentId)) {
+    allGroups.unshift({
+      ...newChatStudent,
+      chatGroupId: 'new',
+      createdAt: new Date().toISOString(),
+      isNew: true
+    });
+  }
+
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [currentMessages]);
@@ -188,17 +198,25 @@ const Chat = () => {
           <div className="flex-grow overflow-y-auto custom-scrollbar p-2 space-y-2">
             {loadingGroups ? (
               <div className="flex justify-center py-10"><Loader className="animate-spin text-library-accent" /></div>
-            ) : groups.map((conv) => (
+            ) : allGroups.map((conv) => (
               <button
-                key={conv.chatGroupId}
+                key={conv.chatGroupId === 'new' ? `new-${conv.otherStudentId}` : conv.chatGroupId}
                 onClick={() => {
                   if (window.innerWidth < 768) setIsSidebarOpen(false);
                   navigate(`/chat/${conv.otherStudentId}`);
                 }}
-                className={`w-full flex items-center gap-3 p-3 rounded-[1.5rem] transition-all group ${activeChatGroupId === conv.chatGroupId ? 'bg-library-primary text-white shadow-xl' : 'hover:bg-library-primary/5 dark:hover:bg-white/5'}`}
+                className={`w-full flex items-center gap-3 p-3 rounded-[1.5rem] transition-all group ${
+                  (activeChatGroupId === conv.chatGroupId) || (conv.chatGroupId === 'new' && !activeChatGroupId) 
+                  ? 'bg-library-primary text-white shadow-xl' 
+                  : 'hover:bg-library-primary/5 dark:hover:bg-white/5'
+                }`}
               >
                 <div className="shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-white/10 flex items-center justify-center border-2 border-white/10 relative">
-                  {studentImages[conv.otherStudentId] ? <img src={studentImages[conv.otherStudentId]} className="w-full h-full object-cover" alt="" /> : <User size={24} className={activeChatGroupId === conv.chatGroupId ? 'text-white' : 'text-library-accent'} />}
+                  {studentImages[conv.otherStudentId] ? (
+                    <img src={studentImages[conv.otherStudentId]} className="w-full h-full object-cover" alt="" />
+                  ) : (
+                    <User size={24} className={(activeChatGroupId === conv.chatGroupId || (conv.chatGroupId === 'new' && !activeChatGroupId)) ? 'text-white' : 'text-library-accent'} />
+                  )}
                   {unreadCounts[conv.chatGroupId] > 0 && (
                     <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#121214]">{unreadCounts[conv.chatGroupId]}</div>
                   )}
@@ -208,8 +226,8 @@ const Chat = () => {
                     <h3 className="text-[13px] font-black truncate">{conv.otherStudentName}</h3>
                     <span className="text-[9px] opacity-60">{new Date(conv.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
-                  <p className={`text-[11px] font-bold truncate ${activeChatGroupId === conv.chatGroupId ? 'text-white/80' : 'text-gray-500'}`}>
-                    اضغط لبدء الدردشة
+                  <p className={`text-[11px] font-bold truncate ${(activeChatGroupId === conv.chatGroupId || (conv.chatGroupId === 'new' && !activeChatGroupId)) ? 'text-white/80' : 'text-gray-500'}`}>
+                    {conv.isNew ? "ابدأ المحادثة الآن..." : "اضغط لمتابعة الدردشة"}
                   </p>
                 </div>
               </button>

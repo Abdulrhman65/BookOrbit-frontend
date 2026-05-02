@@ -195,8 +195,8 @@ const normalizeBorrowingRequest = (request = {}) => {
     lendingRecordId: request.LendingRecordId || request.lendingRecordId || request.lendingListRecordId,
     studentName: request.studentName || request.borrowingStudentName || request.BorrowingStudentName || request.borrowerName || request.BorrowerName || request.student?.fullName || request.borrower?.fullName || "",
     studentId: request.studentId || request.borrowingStudentId || request.BorrowingStudentId || request.StudentId || request.borrowerId || request.BorrowerId || request.student?.id || "",
-    lenderName: request.lenderName || request.LenderName || request.lenderStudentName || request.lenderStudentFullName || request.ownerFullName || request.ownerName || request.OwnerName || request.LendingStudentName || request.LenderStudentName || request.lendingStudentName || request.lenderFullName || request.owner?.fullName || request.lender?.fullName || "",
-    lenderId: request.lenderId || request.LenderId || request.ownerId || request.OwnerId || request.lenderStudentId || request.LenderStudentId || request.owner?.id || "",
+    lenderName: request.lenderName || request.LenderName || request.lenderStudentName || request.lenderStudentFullName || request.LenderStudentFullName || request.ownerFullName || request.OwnerFullName || request.ownerName || request.OwnerName || request.LendingStudentName || request.LenderStudentName || request.lendingStudentName || request.lenderFullName || request.owner?.fullName || request.lender?.fullName || request.lendingListRecord?.student?.fullName || "",
+    lenderId: request.lenderId || request.LenderId || request.ownerId || request.OwnerId || request.lendingStudentId || request.LendingStudentId || request.lenderStudentId || request.LenderStudentId || request.owner?.id || request.lendingListRecord?.studentId || request.lendingListRecord?.student?.id || "",
     bookTitle: request.bookTitle || request.BookTitle || "",
     bookId: request.bookId || request.BookId || "",
     requestDate: request.requestDate || request.createdAtUtc || request.createdAt || request.createdAtUTC,
@@ -842,8 +842,14 @@ export const borrowingApi = {
   /** PATCH /borrowingrequests/{id}/cancel */
   cancel: (id) => apiRequest(`/borrowingrequests/${id}/cancel`, { method: "PATCH", body: JSON.stringify({}) }),
 
-  /** POST /borrowingrequests/{id}/deliver */
-  deliver: (id) => apiRequest(`/borrowingrequests/${id}/deliver`, { method: "POST", body: JSON.stringify({}) }),
+  /** POST /borrowingrequests/{id}/otp — Send OTP to borrower for delivery confirmation */
+  sendDeliverOtp: (id) => apiRequest(`/borrowingrequests/${id}/otp`, { method: "POST", body: JSON.stringify({}) }),
+
+  /** POST /borrowingrequests/{id}/deliver — Complete delivery with OTP */
+  deliver: (id, otp) => apiRequest(`/borrowingrequests/${id}/deliver`, { 
+    method: "POST", 
+    body: JSON.stringify({ otp }) 
+  }),
 };
 
 // ─── 7. BORROWING TRANSACTIONS ───────────────────────────────────────────────
@@ -857,8 +863,14 @@ export const borrowingTransactionsApi = {
   /** GET /borrowingtransactions/{id} */
   getById: (id) => apiRequest(`/borrowingtransactions/${id}`),
 
-  markReturned: (id) =>
-    apiRequest(`/borrowingtransactions/${id}/return`, { method: "PATCH" }),
+  /** POST /borrowingtransactions/{id}/return — Complete return with OTP */
+  return: (id, otp) => apiRequest(`/borrowingtransactions/${id}/return`, { 
+    method: "POST", 
+    body: JSON.stringify({ otp }) 
+  }),
+
+  /** POST /borrowingtransactions/{id}/otp — Send OTP to lender for return confirmation */
+  sendReturnOtp: (id) => apiRequest(`/borrowingtransactions/${id}/otp`, { method: "POST", body: JSON.stringify({}) }),
 
   markLost: (id) =>
     apiRequest(`/borrowingtransactions/${id}/lost`, { method: "PATCH" }),

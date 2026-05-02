@@ -32,7 +32,7 @@ import { showReadableAccessErrorToast } from "../utils/accessMessages";
 import { API_BASE_URL, getBookImageUrl, tokenStore, BOOK_COPY_CONDITION_LABELS, BOOK_COPY_STATE_LABELS, getLabel } from "../utils/constants";
 
 const CONDITION_OPTIONS = Object.entries(BOOK_COPY_CONDITION_LABELS)
-  .filter(([key]) => key[0] === key[0].toUpperCase())
+  .filter(([key]) => isNaN(Number(key))) // Filter out numeric keys to avoid duplicates
   .map(([key, label], index) => ({ value: index, label, key }));
 
 const LENDING_DAYS_PRESETS = [7, 14, 21, 30];
@@ -89,7 +89,7 @@ const ConditionDropdown = ({ value, onChange, disabled }) => {
   }, [open]);
 
   return (
-    <div className="relative" ref={rootRef}>
+    <div className="relative z-[60]" ref={rootRef}>
       <button
         type="button"
         disabled={disabled}
@@ -600,7 +600,7 @@ const MyCopies = () => {
 
         {/* Add copy */}
         <section className="mb-8">
-          <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-2xl border border-white dark:border-white/5 p-5 sm:p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-library-primary/15 dark:hover:border-library-accent/20">
+          <div className="relative z-30 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-xl rounded-2xl border border-white dark:border-white/5 p-5 sm:p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-library-primary/15 dark:hover:border-library-accent/20">
             <h2 className="text-sm font-black text-library-primary dark:text-white mb-4 flex items-center gap-2">
               <span className="inline-flex p-1.5 rounded-lg bg-library-accent/10 text-library-accent">
                 <Sparkles size={16} />

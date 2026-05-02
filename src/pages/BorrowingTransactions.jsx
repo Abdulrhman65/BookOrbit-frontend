@@ -26,6 +26,8 @@ import {
   X,
   Star,
   MessageSquare,
+  KeyRound,
+  ShieldCheck
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
@@ -826,6 +828,13 @@ const BorrowingTransactions = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [reviewTx, setReviewTx] = useState(null);
 
+  // OTP States
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpTargetId, setOtpTargetId] = useState(null);
+  const [otpValue, setOtpValue] = useState("");
+  const [isOtpSending, setIsOtpSending] = useState(false);
+  const [isOtpVerifying, setIsOtpVerifying] = useState(false);
+
   const statusChips = useMemo(
     () => [
       { id: "all", label: "الكل" },
@@ -1003,6 +1012,24 @@ const BorrowingTransactions = () => {
   };
 
   const handleAction = async (id, actionFn, successMsg, isReturnAction = false) => {
+    if (isReturnAction) {
+      // For return, we need OTP first (sent to lender)
+      setProcessingId(id);
+      setIsOtpSending(true);
+      try {
+        await borrowingTransactionsApi.sendReturnOtp(id);
+        setOtpTargetId(id);
+        setShowOtpModal(true);
+        toast.success("تم إرسال رمز التأكيد لصاحب الكتاب");
+      } catch (err) {
+        toast.error(err?.message || "فشل إرسال رمز التأكيد");
+      } finally {
+        setIsOtpSending(false);
+        setProcessingId(null);
+      }
+      return;
+    }
+
     setProcessingId(id);
     const t = toast.loading("جاري التنفيذ...");
     try {
@@ -1020,6 +1047,29 @@ const BorrowingTransactions = () => {
       toast.error(err?.message || "حدث خطأ أثناء التنفيذ", { id: t });
     } finally {
       setProcessingId(null);
+    }
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    if (!otpValue || otpValue.length < 4) {
+      toast.error("يرجى إدخال رمز صحيح");
+      return;
+    }
+
+    setIsOtpVerifying(true);
+    const t = toast.loading("جاري التحقق من الرمز وإرجاع الكتاب...");
+    try {
+      await borrowingTransactionsApi.return(otpTargetId, otpValue);
+      toast.success("تم إرجاع الكتاب بنجاح!", { id: t });
+      setShowOtpModal(false);
+      setOtpValue("");
+      await fetchTransactions();
+      if (studentTx) await handleStudentSearch();
+    } catch (err) {
+      toast.error(err?.message || "رمز التأكيد غير صحيح", { id: t });
+    } finally {
+      setIsOtpVerifying(false);
     }
   };
 
@@ -1240,7 +1290,7 @@ const BorrowingTransactions = () => {
                       onReturn={(id) =>
                         handleAction(
                           id,
-                          borrowingTransactionsApi.markReturned,
+                          null, // OTP flow handles the actual call
                           "تم تسجيل إرجاع الكتاب بنجاح",
                           true
                         )
@@ -1353,7 +1403,7 @@ const BorrowingTransactions = () => {
                         onReturn={(id) =>
                           handleAction(
                             id,
-                            borrowingTransactionsApi.markReturned,
+                            null, // OTP flow handles the actual call
                             "تم تسجيل إرجاع الكتاب بنجاح",
                             true
                           )
@@ -1375,6 +1425,92 @@ const BorrowingTransactions = () => {
           </div>
         </div>
       </main>
+
+      {/* OTP Verification Modal */}
+      <AnimatePresence>
+        {showOtpModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] bg-white p-8 shadow-2xl dark:bg-[#121214] border border-white/10"
+              dir="rtl"
+            >
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 to-library-primary" />
+              
+              <button 
+                onClick={() => setShowOtpModal(false)}
+                className="absolute top-6 left-6 text-gray-400 hover:text-library-primary transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mx-auto mb-4 relative">
+                  <ShieldCheck size={40} className="text-emerald-600" />
+                  <motion.div 
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="absolute inset-0 bg-emerald-500/5 rounded-3xl"
+                  />
+                </div>
+                <h3 className="text-2xl font-black text-library-primary dark:text-white">تأكيد الإرجاع</h3>
+                <p className="mt-2 text-sm font-bold text-gray-500 leading-relaxed">
+                  تم إرسال رمز التأكيد إلى صاحب الكتاب. يرجى الحصول على الرمز منه لتأكيد عملية الإرجاع.
+                </p>
+              </div>
+
+              <form onSubmit={handleOtpSubmit} className="space-y-6">
+                <div className="relative">
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <KeyRound size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    autoFocus
+                    type="text"
+                    maxLength={10}
+                    value={otpValue}
+                    onChange={(e) => setOtpValue(e.target.value)}
+                    placeholder="أدخل رمز الـ OTP هنا..."
+                    className="w-full rounded-2xl border-2 border-gray-100 bg-gray-50 py-4 pl-4 pr-12 text-center text-xl font-black tracking-[0.5em] outline-none transition-all focus:border-emerald-500 focus:bg-white dark:border-white/5 dark:bg-white/5 dark:text-white dark:focus:border-emerald-500"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={isOtpVerifying || !otpValue}
+                    className="flex-1 rounded-2xl bg-emerald-600 py-4 text-sm font-black text-white shadow-xl shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+                  >
+                    {isOtpVerifying ? (
+                      <Loader2 className="mx-auto animate-spin" size={20} />
+                    ) : (
+                      "تحقق وإكمال الإرجاع"
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowOtpModal(false)}
+                    className="flex-1 rounded-2xl bg-gray-100 py-4 text-sm font-black text-gray-500 transition-all hover:bg-gray-200 dark:bg-white/5 dark:text-gray-400"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+
+              <p className="mt-6 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                نظام حماية التبادل الآمن
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
