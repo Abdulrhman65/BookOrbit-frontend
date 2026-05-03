@@ -12,9 +12,10 @@ import {
   Search,
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
+import SafeImage from "../components/common/SafeImage";
 import { useAuth } from "../context/AuthContext";
 import { booksApi } from "../services/api";
-import { getBookImageUrl } from "../utils/constants";
+import { getBookImageUrl, toApiAssetUrl } from "../utils/constants";
 import { showReadableAccessErrorToast } from "../utils/accessMessages";
 import { useNavigate } from "react-router-dom";
 
@@ -85,8 +86,10 @@ const BookCard3D = ({ book }) => {
           ></div>
           <div className="absolute inset-0 bg-white rounded-r-md rounded-l-sm overflow-hidden [transform:translateZ(12px)] shadow-[-5px_5px_15px_rgba(0,0,0,0.2)] border-l-2 border-black/10">
             {book.bookCoverImageUrl || book.id ? (
-              <img
-                src={book.bookCoverImageUrl || getBookImageUrl(book.id)}
+              <SafeImage
+                src={toApiAssetUrl(
+                  book.bookCoverImageUrl || getBookImageUrl(book.id),
+                )}
                 alt={book.title}
                 className="w-full h-full object-cover"
               />

@@ -13,6 +13,9 @@ import {
   Repeat,
   GraduationCap,
   Sparkles,
+  Smartphone,
+  Monitor,
+  Layout,
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
@@ -121,12 +124,86 @@ const BookGraphic = () => (
   </div>
 );
 
+// ─── Download Section ───────────────────────────────────────────────────────
+const DownloadSection = () => {
+  const isNative = !!window.Capacitor || navigator.userAgent.toLowerCase().includes('electron');
+  
+  if (isNative) return null;
+
+  return (
+    <section className="py-24 md:py-32 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+      <div className="grid lg:grid-cols-2 gap-16 items-center">
+        {/* Left - Content */}
+        <SpringReveal>
+          <p className="text-library-accent text-[10px] font-bold uppercase tracking-[0.4em] mb-6">
+            متاح الآن على كافة المنصات
+          </p>
+          <h2 className="text-3xl md:text-5xl font-black text-library-primary dark:text-white mb-8 leading-[1.3] md:leading-[1.4] tracking-tight">
+            احمل مكتبتك معك <br />
+            <span className="text-library-accent">في كل مكان.</span>
+          </h2>
+          <p className="text-lg text-library-primary/60 dark:text-white/60 mb-12 max-w-lg font-medium leading-relaxed">
+            استمتع بتجربة BookOrbit الكاملة على هاتفك أو حاسوبك الشخصي. تصفح، استعر، وتواصل مع زملائك بشكل أسرع وأكثر سلاسة.
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            {/* Mobile App */}
+            <div className="p-8 rounded-3xl bg-white dark:bg-white/[0.03] shadow-sm dark:shadow-none backdrop-blur-md hover:shadow-xl hover:shadow-library-accent/5 transition-all group flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-2xl bg-library-accent/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Smartphone className="text-library-accent" size={28} />
+              </div>
+              <h4 className="text-library-primary dark:text-white font-bold text-xl mb-2">تطبيق الموبايل</h4>
+              <p className="text-library-primary/40 dark:text-white/40 text-sm mb-8">متاح لأنظمة Android و iOS</p>
+              <div className="w-full">
+                <a 
+                  href="/downloads/BookOrbit.apk" 
+                  download 
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-library-accent text-library-primary rounded-xl text-xs font-black uppercase tracking-wider hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-library-accent/20"
+                >
+                  تحميل APK
+                </a>
+              </div>
+            </div>
+
+            {/* Desktop App */}
+            <div className="p-8 rounded-3xl bg-white dark:bg-white/[0.03] shadow-sm dark:shadow-none backdrop-blur-md hover:shadow-xl hover:shadow-library-accent/5 transition-all group flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-2xl bg-library-accent/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Monitor className="text-library-accent" size={28} />
+              </div>
+              <h4 className="text-library-primary dark:text-white font-bold text-xl mb-2">نسخة الويندوز</h4>
+              <p className="text-library-primary/40 dark:text-white/40 text-sm mb-8">تجربة سطح مكتب متكاملة</p>
+              <a 
+                href="/downloads/BookOrbit-Setup.exe" 
+                download 
+                className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-library-accent text-library-primary rounded-xl text-xs font-black uppercase tracking-wider hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-library-accent/20"
+              >
+                تحميل exe
+              </a>
+            </div>
+          </div>
+        </SpringReveal>
+
+        {/* Right - Mockup */}
+        <SpringReveal delay={0.2} className="relative">
+          <div className="relative z-10 group">
+            <div className="absolute inset-0 bg-library-accent/20 rounded-[2rem] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            <img 
+              src="/assets/images/apps.jpeg" 
+              alt="BookOrbit App Mockup" 
+              className="relative z-10 w-full h-auto rounded-3xl shadow-2xl transform group-hover:scale-[1.02] transition-transform duration-700"
+            />
+          </div>
+        </SpringReveal>
+      </div>
+    </div>
+    </section>
+  );
+};
+
 // ─── Contact Section ────────────────────────────────────────────────────────
 const ContactSection = () => (
   <section className="py-16 md:py-20 relative overflow-hidden">
-    {/* Subtle radial glow */}
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-library-accent/[0.02] rounded-full blur-[120px] pointer-events-none" />
-
     <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
       <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-start">
         {/* Left - Info */}
@@ -186,14 +263,6 @@ const ContactSection = () => (
 const Home = () => {
   const { scrollYProgress } = useScroll();
   const yHero = useTransform(scrollYProgress, [0, 0.3], [0, 60]);
-
-  const storyRef = useRef(null);
-  const { scrollYProgress: storyProgress } = useScroll({
-    target: storyRef,
-    offset: ["start start", "end end"],
-  });
-
-  const yStory = useTransform(storyProgress, [0, 1], [0, 450]);
 
   const books = [
     {
@@ -386,7 +455,7 @@ const Home = () => {
         <section className="py-20 md:py-32 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             {/* Header */}
-            <SpringReveal className="flex flex-col md:flex-row justify-between items-center md:items-end mb-14 md:mb-20 pb-10 border-b border-library-primary/[0.06] dark:border-white/[0.06] gap-6 text-center md:text-right">
+            <SpringReveal className="flex flex-col md:flex-row justify-between items-center md:items-end mb-14 md:mb-20 pb-10 gap-6 text-center md:text-right">
               <div>
                 <p className="text-library-accent text-[10px] font-bold uppercase tracking-[0.4em] mb-4">
                   المجموعة الرقمية
@@ -451,6 +520,9 @@ const Home = () => {
             </div>
           </div>
         </section>
+
+        {/* ════════════════════ DOWNLOAD SECTION ════════════════════ */}
+        <DownloadSection />
 
         {/* ════════════════════ CONTACT ════════════════════ */}
         <ContactSection />

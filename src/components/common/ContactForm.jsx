@@ -17,8 +17,7 @@ const ContactForm = () => {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      // يرجى استبدال هذه القيم بالمعرفات الخاصة بك من EmailJS
-      // أو استخدام process.env.REACT_APP_EMAILJS_SERVICE_ID
+     
       const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID || "YOUR_SERVICE_ID";
       const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID || "YOUR_TEMPLATE_ID";
       const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY || "YOUR_PUBLIC_KEY";
@@ -40,7 +39,7 @@ const ContactForm = () => {
     <form
       ref={formRef}
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4 p-7 md:p-9 rounded-2xl border border-library-primary/[0.08] dark:border-white/[0.06] bg-white dark:bg-white/[0.02] shadow-sm dark:shadow-none"
+      className="space-y-4 p-7 md:p-9 rounded-2xl border border-white/[0.06] bg-white/[0.02]"
     >
       <div className="grid md:grid-cols-2 gap-4">
         <div>
@@ -61,7 +60,7 @@ const ContactForm = () => {
               required: "يرجى إدخال بريدك الإلكتروني",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.com$/i,
-                message: "يرجى إدخال بريد إلكتروني صحيح يحتوي على @ وينتهي بـ .com"
+                message: "يرجى إدخال بريد إلكتروني صحيح"
               }
             })}
           />

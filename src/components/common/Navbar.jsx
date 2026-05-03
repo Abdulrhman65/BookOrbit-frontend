@@ -8,7 +8,6 @@ import {
   X,
   LogOut,
   User,
-  Search,
   Bell,
   Shield,
   BookOpen,
@@ -125,28 +124,7 @@ const Navbar = () => {
                 </span>
               </Link>
 
-              <AnimatePresence>
-                {isDashboard &&
-                  isLoggedIn &&
-                  user?.role?.toLowerCase() !== "admin" && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -20, width: 0 }}
-                      animate={{ opacity: 1, x: 0, width: "auto" }}
-                      exit={{ opacity: 0, x: -20, width: 0 }}
-                      className="hidden md:flex relative group ml-2"
-                    >
-                      <Search
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-library-primary/30 dark:text-gray-500 group-focus-within:text-library-accent transition-colors"
-                        size={16}
-                      />
-                      <input
-                        type="text"
-                        placeholder="ابحث عن كتاب أو مؤلف..."
-                        className="bg-library-primary/[0.03] dark:bg-black/40 border border-library-primary/5 dark:border-white/5 focus:border-library-accent/50 rounded-xl pl-4 pr-10 py-2 w-[220px] lg:w-[290px] text-xs focus:outline-none transition-all dark:text-white backdrop-blur-xl focus:shadow-lg focus:shadow-library-accent/5"
-                      />
-                    </motion.div>
-                  )}
-              </AnimatePresence>
+
             </div>
 
             <div className="flex items-center gap-2.5 lg:gap-4">
@@ -452,11 +430,11 @@ const Navbar = () => {
               className="fixed inset-0 z-[95] bg-black/40 backdrop-blur-sm lg:hidden"
             />
             <motion.div
-              initial={{ x: "100%" }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 z-[100] w-[min(100%,22rem)] max-w-[360px] bg-white dark:bg-dark-bg shadow-2xl flex flex-col pt-[max(4rem,env(safe-area-inset-top,0px)+3rem)] px-5 pb-[env(safe-area-inset-bottom,0px)] lg:hidden overflow-hidden border-l border-library-primary/5 dark:border-white/5"
+              className="fixed inset-y-0 left-0 z-[100] w-[min(100%,22rem)] max-w-[360px] bg-white dark:bg-dark-bg shadow-2xl flex flex-col pt-[max(4rem,env(safe-area-inset-top,0px)+3rem)] px-5 pb-[env(safe-area-inset-bottom,0px)] lg:hidden overflow-hidden border-r border-library-primary/5 dark:border-white/5"
             >
               {/* Close Button Inside Drawer */}
               <button
@@ -464,7 +442,7 @@ const Navbar = () => {
                   e.stopPropagation();
                   setMobileMenuOpen(false);
                 }}
-                className="absolute top-[max(1.5rem,env(safe-area-inset-top,0px)+0.5rem)] left-5 w-10 h-10 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all z-[110] border border-gray-100 dark:border-white/5"
+                className="absolute top-[max(1.5rem,env(safe-area-inset-top,0px)+0.5rem)] right-5 w-10 h-10 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all z-[110] border border-gray-100 dark:border-white/5"
               >
                 <X size={20} />
               </button>

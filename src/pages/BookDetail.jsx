@@ -23,6 +23,8 @@ import {
 } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/common/Navbar";
+import SafeImage from "../components/common/SafeImage";
+import { toApiAssetUrl } from "../utils/constants";
 import toast from "react-hot-toast";
 
 const BOOK_COPY_CONDITIONS = {
@@ -384,8 +386,8 @@ const BookDetail = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-library-accent/5 to-transparent"></div>
             <div className="relative w-48 h-72 shadow-2xl rounded-r-xl rounded-l-sm overflow-hidden border-l border-white/20">
               {book.bookCoverImageUrl ? (
-                <img
-                  src={book.bookCoverImageUrl}
+                <SafeImage
+                  src={toApiAssetUrl(book.bookCoverImageUrl)}
                   alt={book.title}
                   className="w-full h-full object-cover"
                 />

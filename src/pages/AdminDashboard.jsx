@@ -10,7 +10,7 @@ import {
   ArrowUpRight,
   TrendingUp,
   BookMarked,
-  CheckCircle,
+  CheckCircle2,
   Shield,
   Search,
   Loader2,
@@ -207,6 +207,7 @@ const AdminDashboard = () => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "ngrok-skip-browser-warning": "69420",
+        "Content-Type": "application/json"
       },
     });
     if (!res.ok) return null;
@@ -297,17 +298,17 @@ const AdminDashboard = () => {
     try {
       let list = [];
       let total = 1;
-      let res;
       let params = { pageSize: 10, page: currentLendingPage };
-
+      let res;
+      
       if (subTab === "active" || subTab === "completed") {
         if (subTab === "active") params.states = [0, 2]; // Borrowed, Overdue
         else if (subTab === "completed") params.states = [1, 3]; // Returned, Lost
         res = await borrowingTransactionsApi.getAll(params);
       } else {
-        if (subTab === "pending_owner") params.states = [0]; // Pending
-        else if (subTab === "pending_handover") params.states = [1]; // Accepted
-        else if (subTab === "rejected") params.states = [2, 3, 4]; // Rejected, Cancelled, Expired
+        if (subTab === "pending_owner") params.States = [0]; // Pending
+        else if (subTab === "pending_handover") params.States = [1]; // Accepted
+        else if (subTab === "rejected") params.States = [2, 3, 4]; // Rejected, Cancelled, Expired
         res = await borrowingApi.getAll(params);
       }
       
@@ -1185,7 +1186,7 @@ const AdminDashboard = () => {
                     disabled={processingBookId === selectedBook.id}
                     className="w-full py-3 rounded-xl bg-emerald-500 text-white text-[11px] font-black hover:bg-emerald-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm shadow-emerald-500/20"
                   >
-                    <CheckCircle size={16} />
+                    <CheckCircle2 size={16} />
                     اعتماد الكتاب
                   </button>
                   <button
@@ -2088,20 +2089,20 @@ const AdminDashboard = () => {
 
               <div className="col-span-3 flex items-center justify-center">
                 <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black border flex items-center gap-1.5 ${
-                  (subTab === "active" || subTab === "completed") ? 'bg-emerald-50 text-emerald-600 border-emerald-500/10 dark:bg-emerald-500/10 dark:text-emerald-400' : 
+                  subTab === "active" ? 'bg-emerald-50 text-emerald-600 border-emerald-500/10 dark:bg-emerald-500/10 dark:text-emerald-400' : 
+                  subTab === "completed" ? 'bg-blue-50 text-blue-600 border-blue-500/10 dark:bg-blue-500/10 dark:text-blue-400' :
                   subTab === "pending_owner" ? 'bg-amber-50 text-amber-600 border-amber-500/10 dark:bg-amber-500/10 dark:text-amber-400' : 
-                  subTab === "rejected" ? 'bg-rose-50 text-rose-600 border-rose-500/10 dark:bg-rose-500/10 dark:text-rose-400' :
                   'bg-blue-50 text-blue-600 border-blue-500/10 dark:bg-blue-500/10 dark:text-blue-400'
                 }`}>
                   <div className={`w-1.5 h-1.5 rounded-full ${
-                    (subTab === "active" || subTab === "completed") ? 'bg-emerald-500' : 
-                    subTab === "pending_owner" ? 'bg-amber-500' : 
-                    subTab === "rejected" ? 'bg-rose-500' : 'bg-blue-500'
+                    subTab === "active" ? 'bg-emerald-500' : 
+                    subTab === "completed" ? 'bg-blue-500' :
+                    subTab === "pending_owner" ? 'bg-amber-500' : 'bg-blue-500'
                   }`} />
                   {(() => {
                     const isTx = subTab === "active" || subTab === "completed";
                     const labels = isTx ? BORROWING_TRANSACTION_STATE_LABELS : BORROWING_REQUEST_STATE_LABELS;
-                    return getLabel(labels, lend.state ?? lend.status, isTx ? "نشطة" : (subTab === "pending_owner" ? 'بانتظار المالك' : (subTab === "rejected" ? 'مرفوضة' : (subTab === "completed" ? 'مكتملة' : 'بانتظار التسليم'))));
+                    return getLabel(labels, lend.state ?? lend.status, isTx ? "نشطة" : (subTab === "pending_owner" ? 'بانتظار المالك' : 'بانتظار التسليم'));
                   })()}
                 </span>
               </div>
@@ -2264,7 +2265,7 @@ const AdminDashboard = () => {
       icon: Users, 
       color: "indigo",
       subTabs: [
-        { id: "verified", title: "الموثقون", icon: CheckCircle },
+        { id: "verified", title: "الموثقون", icon: CheckCircle2 },
         { id: "all", title: "كل الطلاب", icon: Users },
         { id: "pending_approval", title: "انتظار الموافقة", icon: Clock },
         { id: "pending_verification", title: "انتظار التوثيق", icon: UserPlus },
@@ -2289,11 +2290,11 @@ const AdminDashboard = () => {
       icon: BookMarked, 
       color: "amber",
       subTabs: [
-        { id: "active", title: "نشطة", icon: CheckCircle },
+        { id: "active", title: "نشطة", icon: CheckCircle2 },
         { id: "pending_owner", title: "بانتظار القبول", icon: Clock },
         { id: "pending_handover", title: "تم القبول", icon: Check },
         { id: "rejected", title: "مرفوضة", icon: XCircle },
-        { id: "completed", title: "مكتملة", icon: CheckCircle }
+        { id: "completed", title: "مكتملة", icon: CheckCircle2 }
       ]
     }
   ];
@@ -2462,7 +2463,7 @@ const AdminDashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="h-[100dvh] max-h-[100dvh] bg-library-paper dark:bg-dark-bg pt-[calc(4rem+env(safe-area-inset-top,0px))] lg:pt-[calc(4.25rem+env(safe-area-inset-top,0px))] flex flex-col lg:flex-row gap-0 overflow-hidden" style={{ direction: "rtl" }}>
+      <div className="h-screen bg-library-paper dark:bg-dark-bg pt-16 lg:pt-[68px] flex flex-col lg:flex-row gap-0 overflow-hidden" style={{ direction: "rtl" }}>
         
         {/* Premium Dark Sidebar */}
         <div className="hidden lg:block lg:w-[260px] h-full shrink-0">

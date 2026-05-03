@@ -22,8 +22,9 @@ import {
   bookCopiesApi,
   reviewsApi,
 } from "../services/api";
-import { API_V1, tokenStore } from "../utils/constants";
+import { API_V1, tokenStore, toApiAssetUrl } from "../utils/constants";
 import Navbar from "../components/common/Navbar";
+import SafeImage from "../components/common/SafeImage";
 import Aurora from "../components/effects/Aurora";
 import toast from "react-hot-toast";
 
@@ -267,8 +268,10 @@ const PublicProfile = () => {
                 <div className="relative w-32 h-32 mx-auto mb-6">
                   <div className="w-full h-full rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 dark:from-white/10 dark:to-white/5 border-4 border-white dark:border-dark-bg shadow-xl flex items-center justify-center">
                     {profileImage || student.personalPhotoUrl ? (
-                      <img
-                        src={profileImage || student.personalPhotoUrl}
+                      <SafeImage
+                        src={toApiAssetUrl(
+                          profileImage || student.personalPhotoUrl,
+                        )}
                         className="w-full h-full object-cover"
                         alt={displayName}
                       />
@@ -377,8 +380,8 @@ const PublicProfile = () => {
                       <div className="flex gap-4">
                         <div className="w-20 h-28 rounded-2xl overflow-hidden bg-gray-100 dark:bg-black/20 shrink-0 shadow-sm border border-white/10">
                           {record.bookCoverImageUrl ? (
-                            <img
-                              src={record.bookCoverImageUrl}
+                            <SafeImage
+                              src={toApiAssetUrl(record.bookCoverImageUrl)}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                               alt=""
                             />

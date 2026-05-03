@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:7240";
+  process.env.REACT_APP_API_URL || "https://trapeze-sprawl-moneyless.ngrok-free.dev";
 export const API_V1 = `${API_BASE_URL}/api/v1`;
 
 // ─── Token Storage ───────────────────────────────────────────────────────────
@@ -51,24 +51,14 @@ export const toApiAssetUrl = (value) => {
     }
     return raw;
   } catch {
-    if (raw.startsWith("/")) {
-      try {
-        const base = new URL(API_BASE_URL);
-        return `${base.origin}${raw}`;
-      } catch {
-        return raw;
-      }
+    // Handle relative paths (e.g., "/uploads/..." or "uploads/...")
+    try {
+      const base = new URL(API_BASE_URL);
+      const normalizedPath = raw.replace(/^\/+/, "");
+      return `${base.origin}/${normalizedPath}`;
+    } catch {
+      return raw;
     }
-    // Relative path served from API host (some backends omit leading slash).
-    if (/^uploads\//i.test(raw)) {
-      try {
-        const base = new URL(API_BASE_URL);
-        return `${base.origin}/${raw.replace(/^\/+/, "")}`;
-      } catch {
-        return raw;
-      }
-    }
-    return raw;
   }
 };
 

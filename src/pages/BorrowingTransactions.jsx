@@ -30,6 +30,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
+import SafeImage from "../components/common/SafeImage";
 import Aurora from "../components/effects/Aurora";
 import { useAuth } from "../context/AuthContext";
 import { borrowingTransactionsApi, booksApi, bookCopiesApi, reviewsApi } from "../services/api";
@@ -227,14 +228,13 @@ const CoverFromApi = ({ url, alt, wrapClassName, imgClassName }) => {
     );
   }
   return (
-    <img
+    <SafeImage
       src={url}
       alt={alt || ""}
       className={`absolute inset-0 h-full w-full object-cover ${imgClassName || ""}`}
       loading="lazy"
       decoding="async"
       referrerPolicy="no-referrer"
-      onError={() => setBroken(true)}
     />
   );
 };

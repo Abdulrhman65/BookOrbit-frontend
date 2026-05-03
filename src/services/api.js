@@ -1,5 +1,5 @@
 // ─── BookOrbit API Configuration ────────────────────────────────────────────
-import { API_BASE_URL, API_V1, tokenStore, BOOK_CATEGORY_LABELS, getBookImageUrl, getStudentImageUrl, getLabel, BORROWING_REQUEST_STATE_LABELS } from "../utils/constants";
+import { API_BASE_URL, API_V1, tokenStore, BOOK_CATEGORY_LABELS, getBookImageUrl, getStudentImageUrl, getLabel, BORROWING_REQUEST_STATE_LABELS, toApiAssetUrl } from "../utils/constants";
 
 // ─── Token Refresh Queue ─────────────────────────────────────────────────────
 let isRefreshing = false;
@@ -7,28 +7,7 @@ let failedQueue = [];
 
 const toLowerSafe = (value) => String(value ?? "").toLowerCase();
 /** Rewrites localhost asset URLs so they align with REACT_APP_API_URL (same pattern as normalized books). */
-const toApiAssetUrl = (value) => {
-  const raw = String(value ?? "").trim();
-  if (!raw) return "";
-  try {
-    const url = new URL(raw);
-    if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
-      const base = new URL(API_BASE_URL);
-      return `${base.origin}${url.pathname}${url.search}${url.hash}`;
-    }
-    return raw;
-  } catch {
-    if (raw.startsWith("/")) {
-      try {
-        const base = new URL(API_BASE_URL);
-        return `${base.origin}${raw}`;
-      } catch {
-        return raw;
-      }
-    }
-    return raw;
-  }
-};
+
 
 const studentStateMap = {
   0: "pending",   // Unconfirmed

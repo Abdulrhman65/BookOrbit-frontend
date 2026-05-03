@@ -26,10 +26,11 @@ import {
   Info,
 } from "lucide-react";
 import Navbar from "../components/common/Navbar";
+import SafeImage from "../components/common/SafeImage";
 import { useAuth } from "../context/AuthContext";
 import { bookCopiesApi, lendingApi } from "../services/api";
 import { showReadableAccessErrorToast } from "../utils/accessMessages";
-import { API_BASE_URL, getBookImageUrl, tokenStore, BOOK_COPY_CONDITION_LABELS, BOOK_COPY_STATE_LABELS, getLabel } from "../utils/constants";
+import { API_BASE_URL, getBookImageUrl, tokenStore, BOOK_COPY_CONDITION_LABELS, BOOK_COPY_STATE_LABELS, getLabel, toApiAssetUrl } from "../utils/constants";
 
 const CONDITION_OPTIONS = Object.entries(BOOK_COPY_CONDITION_LABELS)
   .filter(([key]) => isNaN(Number(key))) // Filter out numeric keys to avoid duplicates
@@ -44,20 +45,7 @@ const CONDITION_KEY_TO_VALUE = {
   poor: 3,
   worn: 3,
 };
-const toApiAssetUrl = (value) => {
-  const raw = String(value ?? "").trim();
-  if (!raw) return "";
-  try {
-    const url = new URL(raw);
-    if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
-      const base = new URL(API_BASE_URL);
-      return `${base.origin}${url.pathname}${url.search}${url.hash}`;
-    }
-    return raw;
-  } catch {
-    return raw;
-  }
-};
+
 
 /** Custom condition picker — native `<select>` cannot style the open menu. */
 const ConditionDropdown = ({ value, onChange, disabled }) => {
@@ -218,7 +206,7 @@ const CopyCard = ({ copy, imageSrc, onList, onToggleAvailability, onViewDetails,
     >
       <div className="w-full sm:w-32 h-44 sm:h-auto sm:min-h-[160px] bg-gradient-to-br from-library-primary/10 to-library-accent/10 dark:from-white/5 dark:to-white/[0.02] relative shrink-0 overflow-hidden">
         {imageSrc ? (
-          <img
+          <SafeImage
             src={imageSrc}
             alt=""
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
