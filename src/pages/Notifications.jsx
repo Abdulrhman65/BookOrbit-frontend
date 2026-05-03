@@ -149,7 +149,7 @@ const Notifications = () => {
     <div className="min-h-screen bg-library-paper dark:bg-[#08080a] text-library-primary dark:text-library-paper transition-colors duration-500" dir="rtl">
       <Navbar />
 
-      <main className="relative z-10 pt-24 pb-12">
+      <main className="relative z-10 pb-12 pt-under-fixed-nav lg:pt-under-fixed-nav-lg">
         <div className="absolute inset-0 opacity-30 pointer-events-none">
           <Aurora />
         </div>

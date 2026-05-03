@@ -26,6 +26,18 @@
   body {
     @apply bg-library-paper text-library-ink font-sans antialiased overflow-x-hidden relative min-h-screen;
     direction: rtl;
+    /* Mobile: avoid iOS text zoom + respect notch / home indicator */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @supports (min-height: 100dvh) {
+    body {
+      min-height: 100dvh;
+    }
   }
 
   .dark body {
@@ -39,6 +51,16 @@
 }
 
 @layer utilities {
+  /* Space below fixed Navbar + notch (iOS / Capacitor) */
+  .pt-under-fixed-nav {
+    padding-top: calc(4rem + env(safe-area-inset-top, 0px) + 1rem);
+  }
+  @media (min-width: 1024px) {
+    .lg\:pt-under-fixed-nav-lg {
+      padding-top: calc(4.25rem + env(safe-area-inset-top, 0px) + 1.5rem);
+    }
+  }
+
   /* Glass Cards */
   .glass-card {
     @apply bg-white/70 backdrop-blur-2xl border border-white/50;
@@ -410,7 +432,7 @@
    ========================================================================= */
 
 .contact-input {
-  @apply w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 outline-none text-white placeholder-white/25 text-sm;
+  @apply w-full bg-library-primary/[0.03] dark:bg-white/[0.04] border border-library-primary/10 dark:border-white/[0.08] rounded-xl px-5 py-4 outline-none text-library-primary dark:text-white placeholder-library-primary/30 dark:placeholder-white/25 text-sm;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .contact-input:focus {

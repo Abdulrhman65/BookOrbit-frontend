@@ -404,7 +404,7 @@ const MyCopies = () => {
     } finally {
       setLoading(false);
     }
-  }, [studentId, user]);
+  }, [studentId]); // user is only used in error toast — not needed as a dependency
 
   const fetchBookImage = useCallback(async (bookId) => {
     if (!bookId || imageFetchStarted.current.has(bookId)) return;
@@ -529,7 +529,7 @@ const MyCopies = () => {
   if (isAdmin) {
     return (
       <div
-        className="min-h-screen bg-library-paper dark:bg-dark-bg pt-20 lg:pt-24 pb-12"
+        className="min-h-screen bg-library-paper dark:bg-dark-bg pt-under-fixed-nav lg:pt-under-fixed-nav-lg pb-12"
         dir="rtl"
       >
         <Navbar />
@@ -558,7 +558,7 @@ const MyCopies = () => {
 
   return (
     <div
-      className="min-h-screen bg-library-paper dark:bg-dark-bg pt-20 lg:pt-24 pb-12"
+      className="min-h-screen bg-library-paper dark:bg-dark-bg pt-under-fixed-nav lg:pt-under-fixed-nav-lg pb-12"
       dir="rtl"
     >
       <Navbar />

@@ -167,7 +167,7 @@ const AddBook = () => {
     <>
       <Navbar />
 
-      <div dir="rtl" className="min-h-screen bg-library-paper dark:bg-dark-bg pt-32 pb-12 px-4 sm:px-6 lg:px-8 font-sans text-library-ink dark:text-gray-100 transition-colors duration-300">
+      <div dir="rtl" className="min-h-screen bg-library-paper dark:bg-dark-bg pt-[calc(8rem+env(safe-area-inset-top,0px))] pb-12 px-4 sm:px-6 lg:px-8 font-sans text-library-ink dark:text-gray-100 transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           
           {/* Back Button */}

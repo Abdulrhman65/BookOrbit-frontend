@@ -110,7 +110,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-library-paper dark:bg-dark-bg pb-12 pt-20 lg:pt-24" dir="rtl">
+    <div className="min-h-screen bg-library-paper dark:bg-dark-bg pb-12 pt-under-fixed-nav lg:pt-under-fixed-nav-lg" dir="rtl">
       <Navbar />
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <motion.button

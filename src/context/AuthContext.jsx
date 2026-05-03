@@ -20,6 +20,9 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Stable fingerprint of current user — prevents setUser from triggering cascading re-renders
+  // when refreshProfile() returns equivalent data
+  const userFingerprintRef = React.useRef(null);
   const AUTO_REFRESH_INTERVAL_MS = 9 * 60 * 1000;
 
   const buildAbsoluteUrl = useCallback((value) => {
@@ -269,6 +272,17 @@ export const AuthProvider = ({ children }) => {
       if (tokens?.accessToken) {
         const fullUser = await fetchFullProfile();
         if (fullUser && !fullUser.awaitingApproval) {
+          const fingerprint = JSON.stringify({
+            id: fullUser.id,
+            studentId: fullUser.studentId,
+            fullName: fullUser.fullName,
+            telegramUserId: fullUser.telegramUserId,
+            phoneNumber: fullUser.phoneNumber,
+            status: fullUser.status,
+            image: fullUser.image,
+            points: fullUser.points,
+          });
+          userFingerprintRef.current = fingerprint;
           setUser(fullUser);
         } else {
           tokenStore.clear();
@@ -283,7 +297,22 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = useCallback(async () => {
     const fullUser = await fetchFullProfile();
     if (fullUser && !fullUser.awaitingApproval) {
-      setUser(fullUser);
+      // Only call setUser if something meaningful actually changed
+      // This prevents cascading re-renders from useEffect([user]) across the app
+      const fingerprint = JSON.stringify({
+        id: fullUser.id,
+        studentId: fullUser.studentId,
+        fullName: fullUser.fullName,
+        telegramUserId: fullUser.telegramUserId,
+        phoneNumber: fullUser.phoneNumber,
+        status: fullUser.status,
+        image: fullUser.image,
+        points: fullUser.points,
+      });
+      if (fingerprint !== userFingerprintRef.current) {
+        userFingerprintRef.current = fingerprint;
+        setUser(fullUser);
+      }
       return fullUser;
     }
     return null;

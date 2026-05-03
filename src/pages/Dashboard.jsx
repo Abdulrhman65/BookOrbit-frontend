@@ -201,7 +201,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, user]);
+  }, [debouncedSearch, user?.studentId]); // user?.studentId is stable — avoids re-fetch on every user object recreation
 
   useEffect(() => {
     fetchAvailable();
@@ -228,7 +228,7 @@ const Dashboard = () => {
 
       <Navbar />
 
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12 pt-24 lg:pt-28">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 lg:pb-12 pt-under-fixed-nav lg:pt-under-fixed-nav-lg">
         {/* ترحيب — نفس أسلوب البطاقات الزجاجية في لوحة الطالب */}
         <motion.div
           initial="hidden"
@@ -253,7 +253,7 @@ const Dashboard = () => {
           </div>
           <Link
             to="/addbook"
-            className="shrink-0 inline-flex items-center justify-center gap-2.5 rounded-2xl bg-library-primary px-7 py-4 text-sm font-black text-white shadow-lg shadow-library-primary/20 ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:bg-library-accent hover:shadow-xl active:translate-y-0 dark:bg-white dark:text-library-primary dark:ring-white/20 dark:hover:bg-library-accent dark:hover:text-white"
+            className="w-full shrink-0 sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-library-primary px-7 py-4 text-sm font-black text-white shadow-lg shadow-library-primary/20 ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:bg-library-accent hover:shadow-xl active:translate-y-0 dark:bg-white dark:text-library-primary dark:ring-white/20 dark:hover:bg-library-accent dark:hover:text-white"
           >
             <BookMarked size={20} strokeWidth={2} />
             أضف كتاباً لمكتبتك

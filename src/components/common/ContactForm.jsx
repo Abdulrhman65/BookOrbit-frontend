@@ -40,7 +40,7 @@ const ContactForm = () => {
     <form
       ref={formRef}
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4 p-7 md:p-9 rounded-2xl border border-white/[0.06] bg-white/[0.02]"
+      className="space-y-4 p-7 md:p-9 rounded-2xl border border-library-primary/[0.08] dark:border-white/[0.06] bg-white dark:bg-white/[0.02] shadow-sm dark:shadow-none"
     >
       <div className="grid md:grid-cols-2 gap-4">
         <div>

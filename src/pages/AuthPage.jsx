@@ -149,7 +149,7 @@ const AuthPage = () => {
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden bg-library-paper dark:bg-dark-bg"
+      className="min-h-[100dvh] relative overflow-hidden bg-library-paper dark:bg-dark-bg pb-[env(safe-area-inset-bottom,0px)]"
       style={{ direction: "ltr" }}
     >
       <ForgotPasswordModal
@@ -196,7 +196,7 @@ const AuthPage = () => {
 
         {/* RIGHT half → Login form (Desktop) & Switcher (Mobile) */}
         <div
-          className="w-full lg:w-1/2 flex items-center justify-center px-8 sm:px-12 lg:px-12 py-12 lg:py-0"
+          className="w-full lg:w-1/2 flex items-center justify-center px-5 sm:px-12 lg:px-12 py-10 sm:py-12 lg:py-0 pt-[max(2.5rem,env(safe-area-inset-top,0px)+1rem)] lg:pt-0"
           style={{ direction: "rtl" }}
         >
           <div className="max-w-md w-full">

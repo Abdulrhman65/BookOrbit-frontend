@@ -338,7 +338,7 @@ const BookDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-24 pb-12 flex items-center justify-center">
+      <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-under-fixed-nav lg:pt-under-fixed-nav-lg pb-12 flex items-center justify-center">
         <Navbar />
         <Loader2 className="animate-spin text-library-accent" size={40} />
       </div>
@@ -347,7 +347,7 @@ const BookDetail = () => {
 
   if (error || !book) {
     return (
-      <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-24 pb-12 flex flex-col items-center justify-center px-4 text-center">
+      <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-under-fixed-nav lg:pt-under-fixed-nav-lg pb-12 flex flex-col items-center justify-center px-4 text-center">
         <Navbar />
         <AlertCircle size={60} className="text-gray-400 mb-4" />
         <h2 className="text-xl font-black text-library-primary dark:text-white mb-2">
@@ -365,7 +365,7 @@ const BookDetail = () => {
 
   return (
     <div
-      className="min-h-screen bg-library-paper dark:bg-dark-bg pt-24 pb-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300"
+      className="min-h-screen bg-library-paper dark:bg-dark-bg pt-under-fixed-nav lg:pt-under-fixed-nav-lg pb-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300"
       dir="rtl"
     >
       <Navbar />

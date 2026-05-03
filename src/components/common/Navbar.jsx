@@ -50,7 +50,9 @@ const Navbar = () => {
     if (isLoggedIn && user?.role?.toLowerCase() !== "admin") {
       fetchBrief();
     }
-  }, [isLoggedIn, user]);
+    // Only re-fetch when the actual logged-in identity changes (not on every user object recreation)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn, user?.studentId]);
 
   useEffect(() => {
     window.addEventListener("notifications:updated", fetchBrief);
@@ -97,7 +99,7 @@ const Navbar = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 w-full z-50 transition-all duration-700 ease-in-out h-16 lg:h-[68px] ${
+        className={`fixed top-0 w-full z-50 transition-all duration-700 ease-in-out pt-[env(safe-area-inset-top,0px)] ${
           scrolled
             ? "glass-card shadow-xl border-b border-library-primary/10 dark:border-white/10"
             : isDashboard
@@ -105,7 +107,7 @@ const Navbar = () => {
               : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 lg:px-8 h-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 lg:px-8 h-16 lg:h-[68px]">
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-6">
               <Link
@@ -182,6 +184,16 @@ const Navbar = () => {
 
                   {user?.role?.toLowerCase() !== "admin" && (
                     <div className="flex items-center gap-2.5 lg:gap-4">
+                      <Link
+                        to="/notifications"
+                        className="lg:hidden relative w-9 h-9 rounded-lg items-center justify-center bg-white/60 dark:bg-white/5 text-library-primary/70 dark:text-gray-400 hover:text-library-accent transition-all border border-library-primary/10 dark:border-white/10 flex"
+                        title="الإشعارات"
+                      >
+                        <Bell size={17} />
+                        {notifications.some((n) => !n.isRead) && (
+                          <span className="absolute top-2.5 end-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-dark-bg" />
+                        )}
+                      </Link>
                       {/* Messages Icon */}
                       <Link
                         to="/chat"
@@ -440,11 +452,11 @@ const Navbar = () => {
               className="fixed inset-0 z-[95] bg-black/40 backdrop-blur-sm lg:hidden"
             />
             <motion.div
-              initial={{ x: "-100%" }}
+              initial={{ x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
+              exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-[100] w-[85%] max-w-[360px] bg-white dark:bg-dark-bg shadow-2xl flex flex-col pt-16 px-6 lg:hidden overflow-hidden border-r border-library-primary/5 dark:border-white/5"
+              className="fixed inset-y-0 right-0 z-[100] w-[min(100%,22rem)] max-w-[360px] bg-white dark:bg-dark-bg shadow-2xl flex flex-col pt-[max(4rem,env(safe-area-inset-top,0px)+3rem)] px-5 pb-[env(safe-area-inset-bottom,0px)] lg:hidden overflow-hidden border-l border-library-primary/5 dark:border-white/5"
             >
               {/* Close Button Inside Drawer */}
               <button
@@ -452,12 +464,12 @@ const Navbar = () => {
                   e.stopPropagation();
                   setMobileMenuOpen(false);
                 }}
-                className="absolute top-6 left-6 w-10 h-10 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all z-[110] border border-gray-100 dark:border-white/5"
+                className="absolute top-[max(1.5rem,env(safe-area-inset-top,0px)+0.5rem)] left-5 w-10 h-10 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-white/5 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all z-[110] border border-gray-100 dark:border-white/5"
               >
                 <X size={20} />
               </button>
 
-              <div className="absolute top-0 left-0 w-64 h-64 bg-library-accent/10 blur-[100px] rounded-full -ml-32 -mt-32"></div>
+              <div className="absolute top-0 end-0 w-64 h-64 bg-library-accent/10 blur-[100px] rounded-full me-[-8rem] -mt-32 pointer-events-none" />
 
               <div className="flex flex-col gap-6 relative z-10 overflow-y-auto pb-10 flex-grow">
                 <div className="flex items-center gap-3 mb-2 mt-2">
@@ -537,6 +549,19 @@ const Navbar = () => {
                             <MessageSquare size={20} />
                           </div>
                           الرسائل
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/notifications"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="group text-[14px] font-black text-library-primary dark:text-gray-200 flex items-center justify-between p-4 rounded-3xl hover:bg-gray-50 dark:hover:bg-white/5 border border-transparent hover:border-gray-100 dark:hover:border-white/5 active:scale-[0.98] transition-all"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-rose-500/5 text-rose-500 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                            <Bell size={20} />
+                          </div>
+                          الإشعارات
                         </div>
                       </Link>
 

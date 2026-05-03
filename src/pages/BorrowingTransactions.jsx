@@ -366,7 +366,7 @@ const TransactionCard = ({
                   navigate(`/catalog/${bookId}`);
                 }
               }}
-              className={`text-base font-black text-library-primary dark:text-white truncate max-w-[200px] sm:max-w-md ${bookId ? "hover:text-library-accent transition-colors cursor-pointer" : ""}`}
+              className={`min-w-0 flex-1 text-base font-black text-library-primary dark:text-white truncate sm:max-w-md ${bookId ? "hover:text-library-accent transition-colors cursor-pointer" : ""}`}
             >
               {title}
             </h3>
@@ -1138,7 +1138,7 @@ const BorrowingTransactions = () => {
         />
       )}
 
-      <main className="relative z-10 pt-24 pb-12">
+      <main className="relative z-10 pb-12 pt-under-fixed-nav lg:pt-under-fixed-nav-lg">
         <div className="absolute inset-0 opacity-40 dark:opacity-20 pointer-events-none overflow-hidden">
           <Aurora />
         </div>

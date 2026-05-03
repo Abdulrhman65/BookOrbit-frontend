@@ -200,7 +200,7 @@ const PublicProfile = () => {
 
   if (error || !student) {
     return (
-      <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-24 px-4 text-center flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-under-fixed-nav lg:pt-under-fixed-nav-lg px-4 text-center flex flex-col items-center justify-center">
         <Navbar />
         <div className="p-8 rounded-3xl bg-white dark:bg-white/5 border border-red-100 dark:border-red-500/10 max-w-md">
           <AlertCircle size={60} className="text-red-500 mx-auto mb-4" />
@@ -237,7 +237,7 @@ const PublicProfile = () => {
     >
       <Navbar />
 
-      <main className="relative z-10 pt-24 pb-20">
+      <main className="relative z-10 pb-20 pt-under-fixed-nav lg:pt-under-fixed-nav-lg">
         <div className="absolute inset-0 opacity-30 pointer-events-none">
           <Aurora />
         </div>

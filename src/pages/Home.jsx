@@ -232,7 +232,7 @@ const Home = () => {
     <div className="bg-texture min-h-screen relative selection:bg-library-accent/30 overflow-x-hidden">
       <Navbar />
 
-      <main className="relative z-10 pt-20">
+      <main className="relative z-10 pt-under-fixed-nav">
         {/* ════════════════════ HERO SECTION ════════════════════ */}
         <section className="relative min-h-[75vh] flex items-center pt-16 pb-10">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full grid lg:grid-cols-2 gap-10 items-center">
@@ -249,12 +249,12 @@ const Home = () => {
               </SpringReveal>
 
               <SpringReveal delay={0.08} className="mb-5 md:mb-7">
-                <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-black text-library-primary dark:text-library-paper tracking-tight leading-[1.1]">
+                <h1 className="text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.5rem] font-black text-library-primary dark:text-library-paper tracking-tight leading-[1.15] px-1 text-balance">
                   المعرفة لا تُمتلك،
                 </h1>
-                <div className="flex items-center justify-center lg:justify-start gap-4 md:gap-5 mt-2">
-                  <div className="h-1 w-10 md:w-14 bg-library-accent rounded-full accent-line"></div>
-                  <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-black text-library-accent italic tracking-tight leading-[1.1] text-shimmer">
+                <div className="flex items-center justify-center lg:justify-start gap-4 md:gap-5 mt-2 flex-wrap">
+                  <div className="h-1 w-10 md:w-14 bg-library-accent rounded-full accent-line shrink-0"></div>
+                  <h1 className="text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.5rem] font-black text-library-accent italic tracking-tight leading-[1.15] text-shimmer text-balance">
                     بل تُمرر.
                   </h1>
                 </div>

@@ -105,7 +105,7 @@ const StudentDashboard = () => {
       <main className="relative z-10">
         
         {/* ─── HERO SECTION ─── */}
-        <section className="relative w-full pt-24 pb-10 lg:pt-28 lg:pb-14 overflow-hidden border-b border-library-primary/[0.05] dark:border-white/[0.05]">
+        <section className="relative w-full pt-under-fixed-nav lg:pt-under-fixed-nav-lg pb-10 lg:pb-14 overflow-hidden border-b border-library-primary/[0.05] dark:border-white/[0.05]">
           <div className="absolute inset-0 opacity-40 dark:opacity-20 pointer-events-none">
             <Aurora />
           </div>
@@ -207,7 +207,7 @@ const StudentDashboard = () => {
                   <span className="text-xs font-black text-library-primary dark:text-white">متابعة المعاملات الصادرة (استعاراتي)</span>
                   <ArrowUpRight size={14} className="text-library-accent" />
                 </Link>
-                <Link to="/lending" className="flex items-center justify-between rounded-xl px-3 py-2.5 bg-gray-50 dark:bg-white/5 hover:bg-library-accent/5 transition-all border border-transparent hover:border-library-accent/20">
+                <Link to="/lending/incoming" className="flex items-center justify-between rounded-xl px-3 py-2.5 bg-gray-50 dark:bg-white/5 hover:bg-library-accent/5 transition-all border border-transparent hover:border-library-accent/20">
                   <span className="text-xs font-black text-library-primary dark:text-white">متابعة الإعارات النشطة</span>
                   <ArrowUpRight size={14} className="text-library-accent" />
                 </Link>

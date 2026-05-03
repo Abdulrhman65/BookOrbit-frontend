@@ -153,8 +153,9 @@ const BorrowingOutgoingRequests = () => {
   }, [page, debouncedSearch, statusFilter]);
 
   useEffect(() => {
-    if (user && !isAdmin) fetchRequests();
-  }, [fetchRequests, user, isAdmin]);
+    if (user?.studentId && !isAdmin) fetchRequests();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchRequests, user?.studentId, isAdmin]);
 
   // Fetch missing lender names
   useEffect(() => {
@@ -227,7 +228,7 @@ const BorrowingOutgoingRequests = () => {
 
   if (isAdmin) {
     return (
-      <div className="min-h-screen bg-library-paper pb-12 pt-20 dark:bg-[#08080a] lg:pt-24" dir="rtl">
+      <div className="min-h-screen bg-library-paper pb-12 pt-under-fixed-nav lg:pt-under-fixed-nav-lg dark:bg-[#08080a]" dir="rtl">
         <Navbar />
         <div className="mx-auto max-w-2xl px-4 text-center">
           <p className="mb-2 text-lg font-black text-library-primary dark:text-white">إدارة الإعارات من لوحة الإدارة.</p>
@@ -246,7 +247,7 @@ const BorrowingOutgoingRequests = () => {
     <div className="min-h-screen bg-library-paper dark:bg-[#08080a] text-library-primary dark:text-library-paper transition-colors duration-500 overflow-hidden" dir="rtl">
       <Navbar />
 
-      <main className="relative z-10 pt-20 lg:pt-24 pb-12">
+      <main className="relative z-10 pb-12 pt-under-fixed-nav lg:pt-under-fixed-nav-lg">
         <div className="absolute inset-0 opacity-40 dark:opacity-20 pointer-events-none">
           <Aurora />
         </div>

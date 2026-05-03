@@ -2462,7 +2462,7 @@ const AdminDashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="h-screen bg-library-paper dark:bg-dark-bg pt-16 lg:pt-[68px] flex flex-col lg:flex-row gap-0 overflow-hidden" style={{ direction: "rtl" }}>
+      <div className="h-[100dvh] max-h-[100dvh] bg-library-paper dark:bg-dark-bg pt-[calc(4rem+env(safe-area-inset-top,0px))] lg:pt-[calc(4.25rem+env(safe-area-inset-top,0px))] flex flex-col lg:flex-row gap-0 overflow-hidden" style={{ direction: "rtl" }}>
         
         {/* Premium Dark Sidebar */}
         <div className="hidden lg:block lg:w-[260px] h-full shrink-0">

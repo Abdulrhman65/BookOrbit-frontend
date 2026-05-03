@@ -33,6 +33,7 @@ import { API_V1, tokenStore } from "../utils/constants";
 import Navbar from "../components/common/Navbar";
 import Aurora from "../components/effects/Aurora";
 import toast from "react-hot-toast";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const Chat = () => {
   const { studentId } = useParams();
@@ -41,6 +42,7 @@ const Chat = () => {
   const { user: currentUser } = useAuth();
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
+  const isNarrow = useMediaQuery("(max-width: 767px)");
 
   const {
     groups,
@@ -58,7 +60,9 @@ const Chat = () => {
   } = useChat();
 
   const [message, setMessage] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth > 768 : true,
+  );
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -133,6 +137,10 @@ const Chat = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [currentMessages]);
 
+  useEffect(() => {
+    if (isNarrow) setIsSidebarOpen(false);
+  }, [isNarrow]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!message.trim() && !selectedFile) return;
@@ -182,7 +190,7 @@ const Chat = () => {
     >
       <Navbar />
 
-      <main className="flex-grow pt-16 md:pt-20 pb-2 px-2 md:px-8 max-w-7xl mx-auto w-full flex gap-0 md:gap-6 relative z-10 overflow-hidden">
+      <main className="flex-grow pt-under-fixed-nav pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] px-2 sm:px-4 md:px-8 max-w-7xl mx-auto w-full flex gap-0 md:gap-6 relative z-10 overflow-hidden min-h-0">
         <div className="absolute inset-0 opacity-10 pointer-events-none -z-10">
           <Aurora />
         </div>
@@ -190,16 +198,12 @@ const Chat = () => {
         {/* Sidebar */}
         <motion.div
           animate={{
-            width: isSidebarOpen
-              ? window.innerWidth < 768
-                ? "100%"
-                : "380px"
-              : "0px",
+            width: isSidebarOpen ? (isNarrow ? "100%" : "380px") : "0px",
             opacity: isSidebarOpen ? 1 : 0,
           }}
           className={`${
-            !isSidebarOpen && window.innerWidth < 768 ? "hidden" : "flex"
-          } h-[calc(100vh-80px)] md:h-[calc(100vh-100px)] bg-white/80 dark:bg-white/[0.03] backdrop-blur-3xl rounded-none md:rounded-[2rem] border-0 md:border border-white dark:border-white/5 shadow-2xl flex flex-col transition-all duration-500 overflow-hidden shrink-0 z-40 relative`}
+            !isSidebarOpen && isNarrow ? "hidden" : "flex"
+          } h-[calc(100dvh-5.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] md:h-[calc(100dvh-7rem)] bg-white/80 dark:bg-white/[0.03] backdrop-blur-3xl rounded-none md:rounded-[2rem] border-0 md:border border-white dark:border-white/5 shadow-2xl flex flex-col transition-all duration-500 overflow-hidden shrink-0 z-40 relative`}
         >
           <div className="p-4 md:p-5 border-b border-library-primary/5 dark:border-white/5 bg-white/40 dark:bg-white/[0.02]">
             <div className="flex items-center justify-between mb-4">
@@ -245,7 +249,7 @@ const Chat = () => {
                       : conv.chatGroupId
                   }
                   onClick={() => {
-                    if (window.innerWidth < 768) setIsSidebarOpen(false);
+                    if (isNarrow) setIsSidebarOpen(false);
                     navigate(`/chat/${conv.otherStudentId}`);
                   }}
                   className={`w-full flex items-center gap-3 p-3 rounded-[1.5rem] transition-all group ${
@@ -313,11 +317,11 @@ const Chat = () => {
         {/* Chat Area */}
         <motion.div
           animate={{
-            opacity: !isSidebarOpen || window.innerWidth >= 768 ? 1 : 0,
+            opacity: !isSidebarOpen || !isNarrow ? 1 : 0,
           }}
           className={`${
-            isSidebarOpen && window.innerWidth < 768 ? "hidden" : "flex"
-          } flex-grow h-[calc(100vh-80px)] md:h-[calc(100vh-100px)] bg-white/80 dark:bg-white/[0.02] backdrop-blur-3xl rounded-none md:rounded-[2.5rem] border-0 md:border border-white dark:border-white/5 shadow-2xl flex flex-col overflow-hidden relative z-30`}
+            isSidebarOpen && isNarrow ? "hidden" : "flex"
+          } flex-grow h-[calc(100dvh-5.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] md:h-[calc(100dvh-7rem)] bg-white/80 dark:bg-white/[0.02] backdrop-blur-3xl rounded-none md:rounded-[2.5rem] border-0 md:border border-white dark:border-white/5 shadow-2xl flex flex-col overflow-hidden relative z-30 min-h-0`}
         >
           {activeGroup ? (
             <>

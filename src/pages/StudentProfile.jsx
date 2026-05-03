@@ -49,28 +49,33 @@ const StudentProfile = () => {
   });
   const [reviews, setReviews] = useState([]);
 
+  // Sync form fields only when specific user data changes
   useEffect(() => {
     setForm({
       fullName: user?.fullName || user?.Name || "",
       telegramUserId: user?.telegramUserId || user?.TelegramUserId || "",
     });
-    if (user?.studentId) {
-      reviewsApi.getByStudentId(user.studentId)
-        .then(async (res) => {
-          const rawReviews = Array.isArray(res) ? res : (res?.items || []);
-          const uniqueIds = [...new Set(rawReviews.map(r => r.reviewerStudentId || r.ReviewerStudentId).filter(Boolean))];
-          const profiles = await Promise.all(uniqueIds.map(id => studentsApi.getById(id).catch(() => null)));
-          const profileMap = Object.fromEntries(profiles.filter(Boolean).map(p => [p.id || p.Id, p.fullName || p.name || p.Name]));
-          
-          const enriched = rawReviews.map(rev => ({
-            ...rev,
-            reviewerName: profileMap[rev.reviewerStudentId || rev.ReviewerStudentId] || "طالب مجهول"
-          }));
-          setReviews(enriched);
-        })
-        .catch(() => {});
-    }
-  }, [user]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.studentId, user?.fullName, user?.telegramUserId]);
+
+  // Fetch reviews only once when studentId becomes available
+  useEffect(() => {
+    if (!user?.studentId) return;
+    reviewsApi.getByStudentId(user.studentId)
+      .then(async (res) => {
+        const rawReviews = Array.isArray(res) ? res : (res?.items || []);
+        const uniqueIds = [...new Set(rawReviews.map(r => r.reviewerStudentId || r.ReviewerStudentId).filter(Boolean))];
+        const profiles = await Promise.all(uniqueIds.map(id => studentsApi.getById(id).catch(() => null)));
+        const profileMap = Object.fromEntries(profiles.filter(Boolean).map(p => [p.id || p.Id, p.fullName || p.name || p.Name]));
+        const enriched = rawReviews.map(rev => ({
+          ...rev,
+          reviewerName: profileMap[rev.reviewerStudentId || rev.ReviewerStudentId] || "طالب مجهول"
+        }));
+        setReviews(enriched);
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.studentId]);
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -154,7 +159,7 @@ const StudentProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-20 lg:pt-24 pb-12" dir="rtl">
+    <div className="min-h-screen bg-library-paper dark:bg-dark-bg pt-under-fixed-nav lg:pt-under-fixed-nav-lg pb-12" dir="rtl">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
