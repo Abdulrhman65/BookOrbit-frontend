@@ -1,11 +1,13 @@
 export const API_BASE_URL =
-  (process.env.REACT_APP_API_URL || "http://localhost:7240");
+  process.env.REACT_APP_API_URL || "http://localhost:7240";
 export const API_V1 = `${API_BASE_URL}/api/v1`;
 
 // ─── Token Storage ───────────────────────────────────────────────────────────
 export const tokenStore = {
   get: () => {
-    const storage = localStorage.getItem("accessToken") ? localStorage : sessionStorage;
+    const storage = localStorage.getItem("accessToken")
+      ? localStorage
+      : sessionStorage;
     return {
       accessToken: storage.getItem("accessToken"),
       refreshToken: storage.getItem("refreshToken"),
@@ -75,10 +77,16 @@ export const getLabel = (labelsObject, key, defaultValue = "") => {
   if (key === null || key === undefined) return defaultValue;
   const s = String(key).trim();
   const lower = s.toLowerCase();
-  const normalized = lower.replace(/[\s-]/g, '');
-  
+  const normalized = lower.replace(/[\s-]/g, "");
+
   // Try exact, then lowercase, then normalized (no spaces/dashes)
-  return labelsObject[s] || labelsObject[lower] || labelsObject[normalized] || defaultValue || s;
+  return (
+    labelsObject[s] ||
+    labelsObject[lower] ||
+    labelsObject[normalized] ||
+    defaultValue ||
+    s
+  );
 };
 
 // ─── Enum Display Labels ─────────────────────────────────────────────────────

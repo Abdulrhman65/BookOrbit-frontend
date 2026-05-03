@@ -850,7 +850,7 @@ export const borrowingApi = {
   /** POST /borrowingrequests/{id}/deliver — Complete delivery with OTP */
   deliver: (id, otp) => apiRequest(`/borrowingrequests/${id}/deliver`, { 
     method: "POST", 
-    body: JSON.stringify({ otp, OTP: otp }) 
+    body: JSON.stringify({ OtpCode: otp }) 
   }),
 };
 
@@ -867,7 +867,7 @@ export const borrowingTransactionsApi = {
 
   return: (id, otp) => apiRequest(`/borrowingtransactions/${id}/return`, { 
     method: "PATCH", 
-    body: JSON.stringify({ otp, OTP: otp }) 
+    body: JSON.stringify({ OtpCode: otp }) 
   }),
 
   /** POST /borrowingtransactions/{id}/otp — Send OTP to lender for return confirmation */

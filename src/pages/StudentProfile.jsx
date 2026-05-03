@@ -16,6 +16,7 @@ import {
   Loader2,
   Coins,
   Star,
+  Send,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/common/Navbar";
@@ -37,19 +38,21 @@ const StudentProfile = () => {
   const { user, logout, refreshProfile } = useAuth();
   const fileInputRef = useRef(null);
   const [activeSection, setActiveSection] = useState("info"); // info | security
-  const profileCompletion = user?.phoneNumber ? 92 : 72;
+  const profileCompletion = user?.telegramUserId ? 100 : (user?.phoneNumber ? 85 : 70);
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [localPreview, setLocalPreview] = useState(null);
   const [form, setForm] = useState({
     fullName: "",
+    telegramUserId: "",
   });
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     setForm({
       fullName: user?.fullName || user?.Name || "",
+      telegramUserId: user?.telegramUserId || user?.TelegramUserId || "",
     });
     if (user?.studentId) {
       reviewsApi.getByStudentId(user.studentId)
@@ -88,6 +91,9 @@ const StudentProfile = () => {
     try {
       const data = new FormData();
       data.append("Name", form.fullName.trim());
+      if (form.telegramUserId) {
+        data.append("TelegramUserId", form.telegramUserId.trim());
+      }
       await studentsApi.update(user.studentId, data);
       await refreshProfile?.();
       setEditing(false);
@@ -306,6 +312,7 @@ const StudentProfile = () => {
                                 setEditing(false);
                                 setForm({
                                   fullName: user?.fullName || user?.Name || "",
+                                  telegramUserId: user?.telegramUserId || user?.TelegramUserId || "",
                                 });
                               }}
                               className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-black text-gray-600 transition-all hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300"
@@ -334,6 +341,7 @@ const StudentProfile = () => {
                         {!isAdmin ? (
                           <>
                             <ProfileField icon={Phone} label="رقم الهاتف" value={user?.phoneNumber} />
+                            <ProfileField icon={Send} label="يوزر التليجرام" value={user?.telegramUserId ? `@${user.telegramUserId.replace('@', '')}` : "غير مسجل"} color="sky" />
                           </>
                         ) : (
                           <>
@@ -348,7 +356,7 @@ const StudentProfile = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="grid grid-cols-1 md:grid-cols-2 gap-4"
                       >
-                        <div className="space-y-1.5 md:col-span-2">
+                        <div className="space-y-1.5 md:col-span-1">
                           <label className="text-[11px] font-black text-library-primary/60 dark:text-gray-300">الاسم الكامل</label>
                           <input
                             name="fullName"
@@ -357,9 +365,22 @@ const StudentProfile = () => {
                             className="w-full rounded-xl border border-library-primary/10 bg-white px-4 py-3 text-sm font-bold text-library-primary outline-none transition-all focus:border-library-accent/40 focus:ring-2 focus:ring-library-accent/20 dark:border-white/10 dark:bg-dark-surface dark:text-white"
                           />
                         </div>
+                        <div className="space-y-1.5 md:col-span-1">
+                          <label className="text-[11px] font-black text-library-primary/60 dark:text-gray-300">يوزر التليجرام</label>
+                          <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">@</span>
+                            <input
+                              name="telegramUserId"
+                              value={form.telegramUserId?.replace('@', '')}
+                              onChange={handleEditChange}
+                              placeholder="username"
+                              className="w-full rounded-xl border border-library-primary/10 bg-white pl-8 pr-4 py-3 text-sm font-bold text-library-primary outline-none transition-all focus:border-library-accent/40 focus:ring-2 focus:ring-library-accent/20 dark:border-white/10 dark:bg-dark-surface dark:text-white"
+                            />
+                          </div>
+                        </div>
                         <div className="md:col-span-2 rounded-xl border border-library-accent/20 bg-library-accent/5 px-3 py-2">
                           <p className="text-[11px] font-bold text-library-primary/70 dark:text-gray-300">
-                            المتاح حالياً من هذه الصفحة هو تعديل الاسم فقط حسب عقد الـ API الحالي.
+                            المتاح حالياً هو تعديل الاسم ويوزر التليجرام.
                           </p>
                         </div>
                       </motion.div>

@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   BookMarked,
   ArrowUpLeft,
@@ -10,13 +10,13 @@ import {
   LayoutGrid,
   Loader2,
   Search,
-} from 'lucide-react';
-import Navbar from '../components/common/Navbar';
-import { useAuth } from '../context/AuthContext';
-import { booksApi, bookCopiesApi } from '../services/api';
-import { getBookImageUrl } from '../utils/constants';
+} from "lucide-react";
+import Navbar from "../components/common/Navbar";
+import { useAuth } from "../context/AuthContext";
+import { booksApi } from "../services/api";
+import { getBookImageUrl } from "../utils/constants";
 import { showReadableAccessErrorToast } from "../utils/accessMessages";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -51,38 +51,62 @@ const BookCard3D = ({ book }) => {
     >
       {/* 3D Book Container */}
       <div className="relative w-[130px] h-[190px] [perspective:1200px] z-10 mb-[-25px] mt-2 transition-transform duration-300 group-hover:scale-[1.02]">
-        <motion.div
-          className="w-full h-full relative [transform-style:preserve-3d] transition-transform duration-500 ease-out [transform:rotateY(30deg)_rotateX(5deg)] group-hover:[transform:rotateY(0deg)_rotateX(0deg)] cursor-pointer drop-shadow-2xl dark:drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
-        >
-          <div className={`absolute inset-0 ${book.color || 'bg-library-primary'} rounded-l-md [transform:translateZ(-12px)] overflow-hidden border-l border-black/20`}></div>
-          <div className="absolute inset-y-[3px] left-[1px] w-[24px] bg-[#f5f5f5] [transform:translateX(-12px)_rotateY(-90deg)] flex flex-col justify-evenly overflow-hidden border-y border-gray-300 shadow-inner">
-             {Array.from({length: 25}).map((_, i) => <div key={`l-${i}`} className="h-[1px] bg-[#e0e0e0] w-full" />)}
-          </div>
-          <div className="absolute top-[1px] left-[2px] right-0 h-[24px] bg-[#f5f5f5] [transform:translateY(-12px)_rotateX(90deg)] flex justify-evenly overflow-hidden border-r border-gray-300 shadow-inner">
-             {Array.from({length: 30}).map((_, i) => <div key={`t-${i}`} className="w-[1px] bg-[#e0e0e0] h-full" />)}
-          </div>
-          <div className="absolute bottom-[1px] left-[2px] right-0 h-[24px] bg-[#e5e5e5] [transform:translateY(12px)_rotateX(-90deg)] flex justify-evenly overflow-hidden border-r border-gray-300">
-             {Array.from({length: 30}).map((_, i) => <div key={`b-${i}`} className="w-[1px] bg-[#d0d0d0] h-full" />)}
-          </div>
-          <div className={`absolute inset-y-0 right-0 w-[24px] ${book.color || 'bg-library-primary'} [transform:translateX(12px)_rotateY(90deg)] rounded-r-sm overflow-hidden shadow-[inset_2px_0_5px_rgba(0,0,0,0.3)]`}></div>
+        <motion.div className="w-full h-full relative [transform-style:preserve-3d] transition-transform duration-500 ease-out [transform:rotateY(30deg)_rotateX(5deg)] group-hover:[transform:rotateY(0deg)_rotateX(0deg)] cursor-pointer drop-shadow-2xl dark:drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)]">
+          <div
+            className={`absolute inset-0 ${
+              book.color || "bg-library-primary"
+            } rounded-l-md [transform:translateZ(-12px)] overflow-hidden border-l border-black/20`}
+          ></div>
+          <div
+            className="absolute inset-y-[3px] left-[1px] w-[24px] bg-[#f5f5f5] [transform:translateX(-12px)_rotateY(-90deg)] overflow-hidden border-y border-gray-300 shadow-inner"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to bottom,#e0e0e0 0,#e0e0e0 1px,transparent 1px,transparent 6px)",
+            }}
+          />
+          <div
+            className="absolute top-[1px] left-[2px] right-0 h-[24px] bg-[#f5f5f5] [transform:translateY(-12px)_rotateX(90deg)] overflow-hidden border-r border-gray-300 shadow-inner"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to right,#e0e0e0 0,#e0e0e0 1px,transparent 1px,transparent 6px)",
+            }}
+          />
+          <div
+            className="absolute bottom-[1px] left-[2px] right-0 h-[24px] bg-[#e5e5e5] [transform:translateY(12px)_rotateX(-90deg)] overflow-hidden border-r border-gray-300"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to right,#d0d0d0 0,#d0d0d0 1px,transparent 1px,transparent 6px)",
+            }}
+          />
+          <div
+            className={`absolute inset-y-0 right-0 w-[24px] ${
+              book.color || "bg-library-primary"
+            } [transform:translateX(12px)_rotateY(90deg)] rounded-r-sm overflow-hidden shadow-[inset_2px_0_5px_rgba(0,0,0,0.3)]`}
+          ></div>
           <div className="absolute inset-0 bg-white rounded-r-md rounded-l-sm overflow-hidden [transform:translateZ(12px)] shadow-[-5px_5px_15px_rgba(0,0,0,0.2)] border-l-2 border-black/10">
-             {book.bookCoverImageUrl || book.id ? (
-               <img src={book.bookCoverImageUrl || getBookImageUrl(book.id)} alt={book.title} className="w-full h-full object-cover" />
+            {book.bookCoverImageUrl || book.id ? (
+              <img
+                src={book.bookCoverImageUrl || getBookImageUrl(book.id)}
+                alt={book.title}
+                className="w-full h-full object-cover"
+              />
             ) : (
-               <div className="w-full h-full bg-library-primary flex flex-col items-center justify-center p-3 text-center">
-                 <h3 className="text-white font-bold text-sm mb-1 leading-tight">{book.title}</h3>
-                 <p className="text-white/80 text-[10px]">{book.author}</p>
-               </div>
+              <div className="w-full h-full bg-library-primary flex flex-col items-center justify-center p-3 text-center">
+                <h3 className="text-white font-bold text-sm mb-1 leading-tight">
+                  {book.title}
+                </h3>
+                <p className="text-white/80 text-[10px]">{book.author}</p>
+              </div>
             )}
             <div className="absolute top-2 end-2 z-20">
               <span
                 className={`text-[10px] font-black px-2.5 py-1 rounded-full shadow-md backdrop-blur-md border ${
                   available
-                    ? 'bg-emerald-500/95 text-white border-emerald-400/30'
-                    : 'bg-rose-500/95 text-white border-rose-400/30'
+                    ? "bg-emerald-500/95 text-white border-emerald-400/30"
+                    : "bg-rose-500/95 text-white border-rose-400/30"
                 }`}
               >
-                {available ? 'متاح للاستعارة' : 'غير متاح'}
+                {available ? "متاح للاستعارة" : "غير متاح"}
               </span>
             </div>
           </div>
@@ -93,19 +117,21 @@ const BookCard3D = ({ book }) => {
         <h3 className="font-black text-library-primary dark:text-white text-center text-[15px] leading-snug mb-1 line-clamp-2 w-full min-h-[2.5rem]">
           {book.title}
         </h3>
-        <p className="text-library-accent text-xs font-bold mb-3 text-center line-clamp-1 w-full">{book.author}</p>
+        <p className="text-library-accent text-xs font-bold mb-3 text-center line-clamp-1 w-full">
+          {book.author}
+        </p>
         <div className="w-full mt-auto">
           <div className="mb-3 h-px w-full bg-library-primary/10 dark:bg-white/10" />
           <div className="flex justify-between items-center w-full mb-4 gap-2">
             <div className="flex items-center gap-1.5 text-[11px] font-bold text-library-primary/65 dark:text-gray-400 min-w-0">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-library-primary/[0.06] dark:bg-white/[0.06]">
-                <BookMarked size={13} className="text-library-accent" strokeWidth={2} />
+                <BookMarked
+                  size={13}
+                  className="text-library-accent"
+                  strokeWidth={2}
+                />
               </span>
-              <span className="truncate">{book.category || 'عام'}</span>
-            </div>
-            <div className="flex items-center gap-1 shrink-0 rounded-lg bg-amber-500/10 px-2 py-1 border border-amber-500/15">
-              <Star size={12} className="fill-amber-400 text-amber-600" strokeWidth={1.5} />
-              <span className="text-xs font-black text-library-primary dark:text-white">4.8</span>
+              <span className="truncate">{book.category || "عام"}</span>
             </div>
           </div>
           <button
@@ -126,47 +152,18 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [booksData, setBooksData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const isCopyListedAndAvailable = useCallback((copy) => {
-    const listed = copy?.isListed ?? copy?.IsListed;
-    const state = copy?.state ?? copy?.State;
-    return listed === true && (state === 1 || String(state ?? "").toLowerCase() === "available");
-  }, []);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const getAvailableCopiesCountForBook = useCallback(async (bookId) => {
-    const pageSize = 100;
-    let page = 1;
-    let totalPages = 1;
-    let availableCount = 0;
-
-    while (page <= totalPages) {
-      const response = await bookCopiesApi.getByBookId(bookId, { page, pageSize });
-      const items = Array.isArray(response?.items)
-        ? response.items
-        : Array.isArray(response?.data)
-          ? response.data
-          : [];
-      availableCount += items.filter(isCopyListedAndAvailable).length;
-
-      if (page === 1) {
-        const responseTotalPages = Number(response?.totalPages ?? response?.TotalPages ?? 0);
-        if (responseTotalPages > 0) {
-          totalPages = responseTotalPages;
-        } else {
-          const totalCount = Number(response?.totalCount ?? response?.TotalCount ?? 0);
-          totalPages = totalCount > 0 ? Math.ceil(totalCount / pageSize) : 1;
-        }
-      }
-
-      page += 1;
-    }
-
-    return availableCount;
-  }, [isCopyListedAndAvailable]);
   // Prioritize fullName from the student profile
-  const rawName = user?.fullName || user?.Name || user?.name || user?.userName || user?.email?.split('@')[0] || "يا بطل";
-  const firstName = rawName.split(' ')[0];
+  const rawName =
+    user?.fullName ||
+    user?.Name ||
+    user?.name ||
+    user?.userName ||
+    user?.email?.split("@")[0] ||
+    "يا بطل";
+  const firstName = rawName.split(" ")[0];
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search.trim()), 350);
@@ -179,56 +176,52 @@ const Dashboard = () => {
       const res = await booksApi.getAll({
         page: 1,
         pageSize: 30,
-        sortColumn: 'createdAt',
-        sortDirection: 'desc',
+        sortColumn: "createdAt",
+        sortDirection: "desc",
         searchTerm: debouncedSearch || undefined,
+        Statuses: "available", // ← فلترة على مستوى الـ API مباشرة
       });
       const rows = res.items ?? res.data ?? [];
-      const approvedOnly = rows.filter((book) => {
-        const status = String(book?.status ?? "").toLowerCase();
-        const state = book?.state;
-        return (
-          book?.isApproved === true ||
-          status === "active" ||
-          status === "available" ||
-          state === 1 ||
-          String(state).toLowerCase() === "available"
-        );
-      });
-      const booksWithRealAvailability = await Promise.all(
-        approvedOnly.map(async (book) => {
-          try {
-            const availableCopiesCountActual = await getAvailableCopiesCountForBook(book.id);
-            return { ...book, availableCopiesCountActual };
-          } catch {
-            return { ...book, availableCopiesCountActual: 0 };
-          }
-        })
-      );
-      setBooksData(booksWithRealAvailability);
+
+      // Use availability count from the API response directly — no extra calls needed
+      const booksWithAvailability = rows.map((book) => ({
+        ...book,
+        availableCopiesCountActual:
+          book.availableCopiesCount ??
+          book.AvailableCopiesCount ??
+          book.availableLendingRecordsCount ??
+          book.AvailableLendingRecordsCount ??
+          0,
+      }));
+
+      setBooksData(booksWithAvailability);
     } catch (e) {
       showReadableAccessErrorToast(e, user, "تعذر تحميل الكتب المتاحة للإعارة");
       setBooksData([]);
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, getAvailableCopiesCountForBook, user]);
+  }, [debouncedSearch, user]);
 
   useEffect(() => {
     fetchAvailable();
   }, [fetchAvailable]);
 
-
-
   const availableCount = useMemo(
-    () => booksData.filter((book) => Number(book.availableCopiesCountActual ?? 0) > 0).length,
-    [booksData]
+    () =>
+      booksData.filter(
+        (book) => Number(book.availableCopiesCountActual ?? 0) > 0,
+      ).length,
+    [booksData],
   );
 
   return (
     <div className="min-h-screen relative bg-library-paper dark:bg-dark-bg text-library-primary dark:text-library-paper transition-colors duration-300 overflow-x-hidden">
       {/* خلفية هادئة — بدون صورة خارجية أو نبض scale يفسد التركيب */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden>
+      <div
+        className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+        aria-hidden
+      >
         <div className="absolute -top-40 -end-32 w-[min(90vw,520px)] h-[min(90vw,520px)] rounded-full bg-library-primary/[0.06] dark:bg-library-primary/20 blur-3xl" />
         <div className="absolute top-1/3 -start-40 w-80 h-80 rounded-full bg-library-accent/[0.06] dark:bg-library-accent/10 blur-3xl" />
       </div>
@@ -253,7 +246,8 @@ const Dashboard = () => {
                 مرحباً، {firstName} 👋
               </h1>
               <p className="text-sm md:text-base text-library-primary/70 dark:text-gray-400 font-medium leading-relaxed max-w-xl">
-                أهلاً بك في مكتبتك التبادلية؛ تصفّح المراجع المتاحة للإعارة من زملائك.
+                أهلاً بك في مكتبتك التبادلية؛ تصفّح المراجع المتاحة للإعارة من
+                زملائك.
               </p>
             </div>
           </div>
@@ -267,7 +261,12 @@ const Dashboard = () => {
         </motion.div>
 
         <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="lg:col-span-1 space-y-5 lg:space-y-6">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="lg:col-span-1 space-y-5 lg:space-y-6"
+          >
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-dark-border dark:bg-dark-surface">
               <h3 className="mb-1 flex items-center gap-2.5 text-base font-black text-library-primary dark:text-white">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-library-accent/25 bg-library-accent/10 text-library-accent">
@@ -275,10 +274,14 @@ const Dashboard = () => {
                 </span>
                 بحث في الكتب المتاحة
               </h3>
-              <p className="text-xs text-library-primary/50 dark:text-gray-500 font-bold mb-5">حالة الإتاحة تُحسب من النسخ الفعلية المعروضة حالياً.</p>
+              <p className="text-xs text-library-primary/50 dark:text-gray-500 font-bold mb-5">
+                حالة الإتاحة تُحسب من النسخ الفعلية المعروضة حالياً.
+              </p>
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-xs font-black text-library-primary/60 dark:text-gray-400 mb-2 uppercase tracking-wide">ابحث بالعنوان / المالك</h4>
+                  <h4 className="text-xs font-black text-library-primary/60 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                    ابحث بالعنوان / المالك
+                  </h4>
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -290,12 +293,23 @@ const Dashboard = () => {
             </div>
 
             <div className="rounded-2xl bg-library-primary dark:bg-dark-bg p-6 border border-white/10 text-white shadow-xl relative overflow-hidden group ring-1 ring-white/10">
-              <div className="absolute start-6 top-0 h-1 w-14 rounded-b-md bg-library-accent" aria-hidden />
+              <div
+                className="absolute start-6 top-0 h-1 w-14 rounded-b-md bg-library-accent"
+                aria-hidden
+              />
               <div className="absolute -right-10 -top-10 w-36 h-36 bg-library-accent/25 blur-3xl rounded-full group-hover:bg-library-accent/35 transition-all duration-500" />
               <div className="absolute -left-8 bottom-0 w-24 h-24 bg-white/5 blur-2xl rounded-full" />
-              <ShieldCheck size={30} className="text-library-accent mb-3 relative z-10 mt-2" strokeWidth={1.75} />
-              <h3 className="font-black text-lg mb-2 relative z-10">مؤشر سريع</h3>
-              <p className="text-white/75 text-sm mb-5 relative z-10 leading-relaxed">يوجد الآن {availableCount} كتاباً متاحاً للاستعارة في الأرشيف.</p>
+              <ShieldCheck
+                size={30}
+                className="text-library-accent mb-3 relative z-10 mt-2"
+                strokeWidth={1.75}
+              />
+              <h3 className="font-black text-lg mb-2 relative z-10">
+                مؤشر سريع
+              </h3>
+              <p className="text-white/75 text-sm mb-5 relative z-10 leading-relaxed">
+                يوجد الآن {availableCount} كتاباً متاحاً للاستعارة في الأرشيف.
+              </p>
               <Link
                 to="/lending/outgoing"
                 className="inline-flex w-full items-center justify-center bg-library-accent text-library-primary font-black py-3 rounded-xl text-sm hover:bg-white transition-all relative z-10 shadow-md"
@@ -305,16 +319,26 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="lg:col-span-3 min-w-0 space-y-6">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="lg:col-span-3 min-w-0 space-y-6"
+          >
             <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm dark:border-dark-border dark:bg-dark-surface sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <div className="flex items-start gap-3 min-w-0">
                 <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-library-primary text-white shadow-md ring-1 ring-library-primary/20 dark:bg-white dark:text-library-primary">
                   <LayoutGrid size={20} strokeWidth={2} />
                 </span>
                 <div className="min-w-0">
-                  <h2 className="text-base font-black text-library-primary dark:text-white sm:text-lg">كتب الأرشيف</h2>
+                  <h2 className="text-base font-black text-library-primary dark:text-white sm:text-lg">
+                    كتب الأرشيف
+                  </h2>
                   <p className="mt-0.5 text-xs font-bold text-library-primary/55 dark:text-gray-500">
-                    <span className="text-library-accent">{availableCount}</span> كتاباً متاحاً حالياً
+                    <span className="text-library-accent">
+                      {availableCount}
+                    </span>{" "}
+                    كتاباً متاحاً حالياً
                   </p>
                 </div>
               </div>
@@ -332,15 +356,16 @@ const Dashboard = () => {
                 </div>
               ) : booksData.length === 0 ? (
                 <div className="col-span-full rounded-2xl border border-dashed border-gray-200 p-10 text-center dark:border-white/10">
-                  <p className="text-sm font-black text-library-primary dark:text-white">لا توجد كتب متاحة حالياً</p>
-                  <p className="mt-1 text-xs font-bold text-gray-500 dark:text-gray-400">جرّب تعديل البحث أو عد لاحقاً.</p>
+                  <p className="text-sm font-black text-library-primary dark:text-white">
+                    لا توجد كتب متاحة حالياً
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-gray-500 dark:text-gray-400">
+                    جرّب تعديل البحث أو عد لاحقاً.
+                  </p>
                 </div>
               ) : (
                 booksData.map((book) => (
-                  <BookCard3D
-                    key={book.id}
-                    book={book}
-                  />
+                  <BookCard3D key={book.id} book={book} />
                 ))
               )}
             </motion.div>

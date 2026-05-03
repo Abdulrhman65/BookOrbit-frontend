@@ -409,12 +409,20 @@ const BorrowingIncomingRequests = () => {
             <ul className="space-y-3">
               {items.map((req) => {
                 const id = req.id ?? req.Id;
-                const rawSt = req.status ?? req.state;
-                let statusKey = typeof rawSt === "number" ? borrowingNumToKey[rawSt] || "Pending" : rawSt || "Pending";
+                // req.status is already the Arabic label (set by normalizeBorrowingRequest)
+                // We must use req.state which holds the raw numeric or string value from the API
+                const rawSt = req.state;
+                let statusKey = typeof rawSt === "number"
+                  ? borrowingNumToKey[rawSt] || "Pending"
+                  : String(rawSt || "Pending");
                 if (typeof statusKey === "string") {
                   statusKey = statusKey.charAt(0).toUpperCase() + statusKey.slice(1).toLowerCase();
                   if (statusKey === "Approved") statusKey = "Accepted";
+                  if (statusKey === "Active") statusKey = "Accepted";
                 }
+                const canDeliver = statusKey === "Accepted" || rawSt === 1
+                  || String(rawSt).toLowerCase() === "accepted"
+                  || String(rawSt).toLowerCase() === "approved";
                 const statusAr = getLabel(BORROWING_REQUEST_STATE_LABELS, statusKey);
                 const title = req.bookTitle || req.BookTitle || "كتاب";
                 const studentName = req.studentName || req.borrowingStudentName || "طالب";
@@ -478,7 +486,7 @@ const BorrowingIncomingRequests = () => {
                         </>
                       )}
 
-                      {statusKey === "Accepted" && (
+                      {canDeliver && (
                         <>
                           {deliveredIds.has(id) ? (
                             <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-4 py-2 text-xs font-black text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
